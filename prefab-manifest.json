@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "hello-world-prefab",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "entry_point": "src/main.py",
   "dependencies_file": "pyproject.toml",
   "functions": [
@@ -50,41 +50,41 @@
                 "description": "数据点数量",
                 "optional": true
               },
-                "statistics": {
-                  "type": "object",
-                  "description": "统计信息（statistics 操作，使用 numpy 计算）",
-                  "optional": true,
-                  "properties": {
-                    "count": {
-                      "type": "integer",
-                      "description": "数据点数量"
-                    },
-                    "sum": {
-                      "type": "number",
-                      "description": "总和"
-                    },
-                    "average": {
-                      "type": "number",
-                      "description": "平均值"
-                    },
-                    "max": {
-                      "type": "number",
-                      "description": "最大值"
-                    },
-                    "min": {
-                      "type": "number",
-                      "description": "最小值"
-                    },
-                    "std": {
-                      "type": "number",
-                      "description": "标准差"
-                    },
-                    "variance": {
-                      "type": "number",
-                      "description": "方差"
-                    }
+              "statistics": {
+                "type": "object",
+                "description": "统计信息（statistics 操作，使用 numpy 计算）",
+                "optional": true,
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "数据点数量"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "总和"
+                  },
+                  "average": {
+                    "type": "number",
+                    "description": "平均值"
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "最大值"
+                  },
+                  "min": {
+                    "type": "number",
+                    "description": "最小值"
+                  },
+                  "std": {
+                    "type": "number",
+                    "description": "标准差"
+                  },
+                  "variance": {
+                    "type": "number",
+                    "description": "方差"
                   }
                 }
+              }
             }
           },
           "error": {
