@@ -278,26 +278,46 @@ uv sync --dev
 
 ### 单元测试
 
-使用 Pytest 编写测试：
+**使用真实数据文件进行测试** - 这是我们的核心测试理念。
+
+本模板展示了如何使用真实媒体文件（`tests/test.mp4`）进行功能测试：
 
 ```python
-# tests/test_main.py
-import sys
+# tests/test_video.py
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import pytest
+from src.main import video_to_audio
 
-from src import analyze_dataset
-
-def test_analyze_dataset():
-    result = analyze_dataset([1, 2, 3, 4, 5], "statistics")
-    assert result["success"] is True
-    assert result["data"]["statistics"]["average"] == 3.0
+class TestVideoToAudio:
+    @pytest.fixture
+    def test_video_path(self):
+        """提供真实的测试视频文件"""
+        return os.path.join(os.path.dirname(__file__), "test.mp4")
+    
+    def test_video_to_audio_default(self, test_video_path):
+        """使用真实视频测试转换功能"""
+        result = video_to_audio(test_video_path)
+        
+        assert result["success"] is True
+        assert os.path.exists(result["data"]["output_file"])
 ```
 
-运行测试：
+**测试数据最佳实践：**
+- ✅ 将小型真实数据提交到 `tests/` 目录（< 5MB）
+- ✅ 测试可重现、可审核
+- ❌ 避免仅用 mock 数据
+
+**运行测试：**
 
 ```bash
-pytest tests/ -v
+# 运行所有测试（使用 uv）
+uv run --with pytest pytest tests/ -v
+
+# 运行特定测试
+uv run --with pytest pytest tests/test_video.py -v
+
+# 查看测试覆盖率
+uv run --with pytest --with pytest-cov pytest tests/ --cov=src --cov-report=html
 ```
 
 ### Manifest 验证
@@ -429,16 +449,29 @@ def my_function():
     return helper_function()
 ```
 
-本模板已包含完整的多文件示例，参见 `src/utils/` 目录和 `analyze_numbers` 函数。
+本模板已包含完整的多文件示例，参见 `src/utils/` 目录。
+
+### Q: 为什么要将测试数据提交到仓库？
+
+**A**: 
+1. **可重现性** - 任何人都能运行测试并得到相同结果
+2. **可审核性** - 社区可以验证预制件确实能处理真实数据
+3. **CI/CD 自动化** - GitHub Actions 可以自动运行完整测试
+
+**最佳实践：**
+- 使用小型但真实的测试数据（如 5 秒的视频片段）
+- 在 README 中说明测试数据的来源和用途
+- 如果数据涉及版权，使用自己创建的测试数据
 
 ### Q: 如何调试 CI/CD 失败？
 
 **A**: 
 1. 查看 GitHub Actions 的日志输出
 2. 本地运行相同的命令进行复现：
-   - `pytest tests/` - 测试失败？
-   - `flake8 src/` - 代码风格问题？
-   - `python scripts/validate_manifest.py` - Manifest 不一致？
+   - `uv run --with pytest pytest tests/ -v` - 测试失败？
+   - `uv run --with flake8 flake8 src/` - 代码风格问题？
+   - `uv run python scripts/validate_manifest.py` - Manifest 不一致？
+3. 检查是否使用了正确的 uv 环境
 
 ### Q: 版本号规范是什么？
 

@@ -4,8 +4,9 @@
 导出所有可被 AI 调用的函数
 """
 
-from .main import analyze_dataset
+from .main import analyze_dataset, video_to_audio
 
 __all__ = [
-    'analyze_dataset'
+    'analyze_dataset',
+    'video_to_audio'
 ]

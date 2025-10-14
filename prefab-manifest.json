@@ -104,6 +104,91 @@
           }
         }
       }
+    },
+    {
+      "name": "video_to_audio",
+      "description": "将视频文件转换为音频文件",
+      "parameters": [
+        {
+          "name": "video_path",
+          "type": "str",
+          "description": "输入视频文件路径",
+          "required": true
+        },
+        {
+          "name": "output_path",
+          "type": "str",
+          "description": "输出音频文件路径（默认为视频同目录下的同名音频文件）",
+          "required": false,
+          "default": null
+        },
+        {
+          "name": "audio_format",
+          "type": "str",
+          "description": "音频格式：'mp3', 'wav', 'aac', 'flac', 'ogg'",
+          "required": false,
+          "default": "mp3"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "返回转换结果对象",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
+          },
+          "data": {
+            "type": "object",
+            "description": "成功时的转换结果数据",
+            "optional": true,
+            "properties": {
+              "input_file": {
+                "type": "string",
+                "description": "输入视频文件路径"
+              },
+              "output_file": {
+                "type": "string",
+                "description": "输出音频文件路径"
+              },
+              "format": {
+                "type": "string",
+                "description": "输出音频格式"
+              },
+              "duration": {
+                "type": "number",
+                "description": "音频时长（秒）"
+              },
+              "sample_rate": {
+                "type": "number",
+                "description": "音频采样率"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "错误信息（仅在 success=false 时存在）",
+            "optional": true
+          },
+          "error_code": {
+            "type": "string",
+            "description": "错误代码（仅在 success=false 时存在）",
+            "optional": true,
+            "enum": [
+              "FILE_NOT_FOUND",
+              "INVALID_FORMAT",
+              "NO_AUDIO_TRACK",
+              "DEPENDENCY_MISSING",
+              "CONVERSION_FAILED"
+            ]
+          },
+          "supported_formats": {
+            "type": "array",
+            "description": "支持的音频格式列表（仅在 error_code=INVALID_FORMAT 时存在）",
+            "optional": true
+          }
+        }
+      }
     }
   ]
 }

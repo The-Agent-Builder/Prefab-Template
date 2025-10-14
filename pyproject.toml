@@ -20,6 +20,7 @@ classifiers = [
 
 # 运行时依赖（会被打包到最终产物中）
 dependencies = [
+    "moviepy>=2.2.1",
     "numpy>=1.24.0", # 用于高性能数学计算
 ]
 

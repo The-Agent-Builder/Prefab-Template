@@ -37,7 +37,13 @@ jobs:
       - name: 运行单元测试 (Pytest)
         run: |
           echo "🧪 运行单元测试..."
-          uv run --with pytest pytest tests/ -v
+          echo "📝 注意：测试使用真实数据文件（如 tests/test.mp4）确保功能可用性"
+          uv run --with pytest pytest tests/ -v --tb=short
+      
+      - name: 测试覆盖率报告
+        run: |
+          echo "📊 生成测试覆盖率报告..."
+          uv run --with pytest --with pytest-cov pytest tests/ --cov=src --cov-report=term-missing
       
       - name: 验证 Manifest 与代码一致性
         run: |
