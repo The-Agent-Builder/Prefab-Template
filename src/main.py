@@ -62,11 +62,11 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
         }
 
     except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "error_code": "UNEXPECTED_ERROR"
-            }
+        return {
+            "success": False,
+            "error": str(e),
+            "error_code": "UNEXPECTED_ERROR"
+        }
 
 
 def video_to_audio(video_path: str, output_path: str = None, audio_format: str = "mp3") -> dict:
