@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "id": "hello-world-prefab",
+  "version": "1.0.0",
+  "entry_point": "src/main.py",
+  "dependencies_file": "pyproject.toml",
+  "functions": [
+    {
+      "name": "analyze_dataset",
+      "description": "分析数据集并返回统计结果",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "list",
+          "description": "数字列表",
+          "required": true
+        },
+        {
+          "name": "operation",
+          "type": "str",
+          "description": "操作类型：'statistics'(完整统计), 'sum'(求和), 'average'(平均值)",
+          "required": false,
+          "default": "statistics"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "返回结果对象",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
+          },
+          "data": {
+            "type": "object",
+            "description": "成功时的结果数据（仅在 success=true 时存在）",
+            "optional": true,
+            "properties": {
+              "operation": {
+                "type": "string",
+                "description": "执行的操作类型"
+              },
+              "value": {
+                "type": "number",
+                "description": "计算结果值（sum 或 average 操作）",
+                "optional": true
+              },
+              "count": {
+                "type": "integer",
+                "description": "数据点数量",
+                "optional": true
+              },
+              "statistics": {
+                "type": "object",
+                "description": "统计信息（statistics 操作）",
+                "optional": true,
+                "properties": {
+                  "count": {"type": "integer"},
+                  "sum": {"type": "number"},
+                  "average": {"type": "number"},
+                  "max": {"type": "number"},
+                  "min": {"type": "number"}
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "错误信息（仅在 success=false 时存在）",
+            "optional": true
+          },
+          "error_code": {
+            "type": "string",
+            "description": "错误代码（仅在 success=false 时存在）",
+            "optional": true,
+            "enum": ["EMPTY_DATA", "INVALID_OPERATION", "UNEXPECTED_ERROR"]
+          }
+        }
+      }
+    }
+  ]
+}

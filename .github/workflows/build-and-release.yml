@@ -1,0 +1,169 @@
+name: Build and Release Prefab
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # 触发条件: 版本标签 (例如 v1.0.0)
+
+jobs:
+  validate-build-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 安装 uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      
+      - name: 设置 Python 环境
+        run: uv python install 3.11
+      
+      - name: 安装依赖
+        run: uv sync --dev
+      
+      # ==================== 验证阶段 ====================
+      
+      - name: 运行代码风格检查 (Flake8)
+        run: |
+          echo "🔍 运行 Flake8 代码风格检查..."
+          uv run flake8 src/ --max-line-length=120 --exclude=__pycache__,*.pyc
+      
+      - name: 运行单元测试 (Pytest)
+        run: |
+          echo "🧪 运行单元测试..."
+          uv run pytest tests/ -v
+      
+      - name: 验证 Manifest 与代码一致性
+        run: |
+          echo "🔍 验证 prefab-manifest.json 与 src/main.py 的一致性..."
+          uv run python scripts/validate_manifest.py
+      
+      - name: 验证版本号一致性
+        run: |
+          echo "🔍 验证 Git Tag 与 manifest 版本号一致性..."
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          MANIFEST_VERSION=$(python -c "import json; print(json.load(open('prefab-manifest.json'))['version'])")
+          
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "❌ 错误: Git Tag 版本 ($TAG_VERSION) 与 manifest 版本 ($MANIFEST_VERSION) 不一致"
+            exit 1
+          fi
+          
+          echo "✅ 版本号验证通过: $TAG_VERSION"
+      
+      # ==================== 构建阶段 ====================
+      
+      - name: 创建构建目录
+        run: |
+          echo "📁 创建构建目录..."
+          mkdir -p build
+      
+      - name: 复制核心文件
+        run: |
+          echo "📋 复制核心文件到构建目录..."
+          cp -r src build/
+          cp prefab-manifest.json build/
+          echo "✅ 文件复制完成"
+      
+      - name: 下载依赖到 vendor 目录
+        run: |
+          echo "📦 下载运行时依赖..."
+          # 从 pyproject.toml 读取运行时依赖
+          DEPS=$(python -c "
+          import tomllib
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+              deps = data.get('project', {}).get('dependencies', [])
+              print(' '.join(deps) if deps else '')
+          ")
+          
+          if [ -n "$DEPS" ]; then
+            pip install --target=./build/vendor $DEPS
+            echo "✅ 依赖下载完成"
+          else
+            echo "ℹ️  无运行时依赖需要下载"
+          fi
+      
+      # ==================== 打包阶段 ====================
+      
+      - name: 打包预制件
+        id: package
+        run: |
+          echo "📦 打包预制件..."
+          MANIFEST_ID=$(python -c "import json; print(json.load(open('prefab-manifest.json'))['id'])")
+          MANIFEST_VERSION=$(python -c "import json; print(json.load(open('prefab-manifest.json'))['version'])")
+          PACKAGE_NAME="${MANIFEST_ID}-${MANIFEST_VERSION}.tar.gz"
+          
+          cd build
+          tar -czf "../${PACKAGE_NAME}" .
+          cd ..
+          
+          echo "✅ 打包完成: ${PACKAGE_NAME}"
+          echo "package_name=${PACKAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "manifest_id=${MANIFEST_ID}" >> $GITHUB_OUTPUT
+          echo "manifest_version=${MANIFEST_VERSION}" >> $GITHUB_OUTPUT
+      
+      - name: 验证打包文件
+        run: |
+          PACKAGE_NAME="${{ steps.package.outputs.package_name }}"
+          echo "🔍 验证打包文件: ${PACKAGE_NAME}"
+          
+          if [ ! -f "${PACKAGE_NAME}" ]; then
+            echo "❌ 错误: 打包文件不存在"
+            exit 1
+          fi
+          
+          FILE_SIZE=$(stat -f%z "${PACKAGE_NAME}" 2>/dev/null || stat -c%s "${PACKAGE_NAME}")
+          echo "📊 文件大小: ${FILE_SIZE} bytes"
+          
+          echo "📋 包内容:"
+          tar -tzf "${PACKAGE_NAME}" | head -20
+          
+          echo "✅ 打包文件验证通过"
+      
+      # ==================== 发布阶段 ====================
+      
+      - name: 创建 GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            ## 🎉 预制件发布: ${{ steps.package.outputs.manifest_id }}
+            
+            **版本:** ${{ steps.package.outputs.manifest_version }}
+            **标签:** ${{ github.ref_name }}
+            
+            ### 📦 下载
+            下载下方的 `.tar.gz` 文件即可使用此预制件。
+            
+            ### 🚀 使用方法
+            请参考 [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) 了解详细使用说明。
+            
+            ---
+            _此 Release 由 GitHub Actions 自动生成_
+          draft: false
+          prerelease: false
+      
+      - name: 上传预制件包
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.package.outputs.package_name }}
+          asset_name: ${{ steps.package.outputs.package_name }}
+          asset_content_type: application/gzip
+      
+      - name: 发布成功
+        run: |
+          echo "🎉 预制件发布成功!"
+          echo "📦 包名: ${{ steps.package.outputs.package_name }}"
+          echo "🔗 Release URL: ${{ steps.create_release.outputs.html_url }}"
+
