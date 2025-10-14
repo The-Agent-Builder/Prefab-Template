@@ -5,6 +5,7 @@
 """
 
 from typing import List, Tuple, Union
+import numpy as np
 
 
 def calculate_average(numbers: List[Union[int, float]]) -> float:
@@ -47,13 +48,13 @@ def find_max_min(numbers: List[Union[int, float]]) -> Tuple[float, float]:
 
 def calculate_statistics(numbers: List[Union[int, float]]) -> dict:
     """
-    计算统计信息
+    计算统计信息（使用 numpy 进行高性能计算）
 
     Args:
         numbers: 数字列表
 
     Returns:
-        包含统计信息的字典
+        包含统计信息的字典，包括标准差和方差
     """
     if not numbers:
         return {
@@ -61,15 +62,20 @@ def calculate_statistics(numbers: List[Union[int, float]]) -> dict:
             "sum": 0,
             "average": 0,
             "max": None,
-            "min": None
+            "min": None,
+            "std": None,
+            "variance": None
         }
 
-    max_val, min_val = find_max_min(numbers)
+    # 使用 numpy 进行高性能计算
+    arr = np.array(numbers)
 
     return {
         "count": len(numbers),
-        "sum": sum(numbers),
-        "average": calculate_average(numbers),
-        "max": max_val,
-        "min": min_val
+        "sum": float(np.sum(arr)),
+        "average": float(np.mean(arr)),
+        "max": float(np.max(arr)),
+        "min": float(np.min(arr)),
+        "std": float(np.std(arr)),  # 标准差
+        "variance": float(np.var(arr))  # 方差
     }
