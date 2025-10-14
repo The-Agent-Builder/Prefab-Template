@@ -29,12 +29,12 @@ jobs:
       - name: 运行代码风格检查 (Flake8)
         run: |
           echo "🔍 运行 Flake8 代码风格检查..."
-          uv run flake8 src/ --max-line-length=120 --exclude=__pycache__,*.pyc
+          uv run --with flake8 flake8 src/ --max-line-length=120 --exclude=__pycache__,*.pyc
       
       - name: 运行单元测试 (Pytest)
         run: |
           echo "🧪 运行单元测试..."
-          uv run pytest tests/ -v
+          uv run --with pytest pytest tests/ -v
       
       - name: 验证 Manifest 与代码一致性
         run: |
