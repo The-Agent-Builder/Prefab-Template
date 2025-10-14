@@ -19,12 +19,9 @@ classifiers = [
 ]
 
 # 运行时依赖（会被打包到最终产物中）
-# 示例：如果你的预制件需要第三方库，在这里添加
-# dependencies = ["requests>=2.31.0", "pandas>=2.0.0"]
-dependencies = []
-
-# 如果需要添加依赖，取消注释上面的示例或添加你自己的依赖
-# 例如：dependencies = ["requests>=2.31.0"]
+dependencies = [
+    "numpy>=1.24.0", # 用于高性能数学计算
+]
 
 [project.optional-dependencies]
 # 开发和测试依赖（不会被打包）
