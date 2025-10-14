@@ -73,18 +73,26 @@ jobs:
       
       - name: 下载依赖到 vendor 目录
         run: |
-          echo "📦 下载运行时依赖..."
-          # 从 pyproject.toml 读取运行时依赖
-          DEPS=$(python -c "
+          echo "📦 使用 uv 下载运行时依赖..."
+          
+          # 检查是否有运行时依赖
+          HAS_DEPS=$(python -c "
           import tomllib
           with open('pyproject.toml', 'rb') as f:
               data = tomllib.load(f)
               deps = data.get('project', {}).get('dependencies', [])
-              print(' '.join(deps) if deps else '')
+              print('yes' if deps else 'no')
           ")
           
-          if [ -n "$DEPS" ]; then
-            pip install --target=./build/vendor $DEPS
+          if [ "$HAS_DEPS" = "yes" ]; then
+            # 使用 uv pip 安装依赖到 vendor 目录
+            uv pip install --python 3.11 --target=./build/vendor $(python -c "
+            import tomllib
+            with open('pyproject.toml', 'rb') as f:
+                data = tomllib.load(f)
+                deps = data.get('project', {}).get('dependencies', [])
+                print(' '.join(deps))
+            ")
             echo "✅ 依赖下载完成"
           else
             echo "ℹ️  无运行时依赖需要下载"
