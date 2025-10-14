@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "hello-world-prefab",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "entry_point": "src/main.py",
   "dependencies_file": "pyproject.toml",
   "functions": [
@@ -55,11 +55,21 @@
                 "description": "统计信息（statistics 操作）",
                 "optional": true,
                 "properties": {
-                  "count": {"type": "integer"},
-                  "sum": {"type": "number"},
-                  "average": {"type": "number"},
-                  "max": {"type": "number"},
-                  "min": {"type": "number"}
+                  "count": {
+                    "type": "integer"
+                  },
+                  "sum": {
+                    "type": "number"
+                  },
+                  "average": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  },
+                  "min": {
+                    "type": "number"
+                  }
                 }
               }
             }
@@ -73,7 +83,11 @@
             "type": "string",
             "description": "错误代码（仅在 success=false 时存在）",
             "optional": true,
-            "enum": ["EMPTY_DATA", "INVALID_OPERATION", "UNEXPECTED_ERROR"]
+            "enum": [
+              "EMPTY_DATA",
+              "INVALID_OPERATION",
+              "UNEXPECTED_ERROR"
+            ]
           }
         }
       }
