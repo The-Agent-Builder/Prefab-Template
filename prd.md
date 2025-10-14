@@ -54,16 +54,16 @@
 
 1.  **触发条件:** 当一个格式为 `v*.*.*` (e.g., `v1.0.0`) 的 Git Tag 被推送到仓库时触发。
 2.  **验证阶段 (Validation):**
-    *   运行代码风格检查 (Linter, e.g., Flake8)。
-    *   运行单元测试 (Pytest)。
-    *   **关键验证:** 运行一个脚本，校验 `prefab-manifest.json` 与 `src/main.py` 中的函数签名是否一致。
+    *   使用 `uv run --with flake8` 运行代码风格检查 (Flake8)。
+    *   使用 `uv run --with pytest` 运行单元测试 (Pytest)。
+    *   **关键验证:** 运行一个脚本，校验 `prefab-manifest.json` 与 `src/main.py` 中的函数签名是否一致（包括返回值结构）。
     *   *任何验证失败都将导致整个流程失败。*
 3.  **构建阶段 (Build):**
     *   创建一个临时的 `build/` 目录。
     *   将 `src/` 目录和 `prefab-manifest.json` 复制到 `build/`。
-    *   读取 `requirements.txt`，使用 `pip install --target=./build/vendor` 将所有依赖项下载到 `build/vendor/` 目录。
+    *   从 `pyproject.toml` 读取运行时依赖，使用 `uv pip install --target=./build/vendor` 将所有依赖项下载到 `build/vendor/` 目录。
 4.  **打包阶段 (Packaging):**
-    *   将 `build/` 目录的内容打包成一个 `.tar.gz` 压缩文件，命名规范为 `{id}-{version}.tar.gz` (e.g., `video-to-text-v1-1.0.0.tar.gz`)。
+    *   将 `build/` 目录的内容打包成一个 `.tar.gz` 压缩文件，命名规范为 `{id}-{version}.tar.gz` (e.g., `hello-world-prefab-0.0.4.tar.gz`)。
 5.  **发布阶段 (Release):**
     *   自动创建一个与 Git Tag 对应的 GitHub Release。
     *   将打包好的 `.tar.gz` 文件作为该 Release 的唯一附件 (Artifact) 上传。
