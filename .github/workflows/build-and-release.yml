@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'  # 触发条件: 版本标签 (例如 v1.0.0)
 
+permissions:
+  contents: write  # 允许创建 Release 和上传资产
+
 jobs:
   validate-build-release:
     runs-on: ubuntu-latest
