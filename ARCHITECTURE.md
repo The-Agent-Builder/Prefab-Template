@@ -175,14 +175,19 @@ graph TD
     G2 --> G3[下载运行时依赖]
     
     G3 --> H[打包阶段]
-    H --> H1[创建 tar.gz]
-    H1 --> H2[验证打包文件]
+    H --> H1[构建 Wheel 包]
+    H1 --> H2[验证 Wheel 包]
     
     H2 --> I[发布阶段]
     I --> I1[创建 GitHub Release]
-    I1 --> I2[上传附件]
+    I1 --> I2[上传 .whl 文件]
     I2 --> J[完成]
 ```
+
+**v2 版本变更：**
+- 打包格式从 `.tar.gz` 改为标准 Python Wheel (`.whl`)
+- 版本验证包括 `pyproject.toml`、`prefab-manifest.json` 和 Git Tag 三方一致性
+- 类型系统升级到 v2.2，支持 `InputFile` 和 `OutputFile`
 
 ### 验证机制
 

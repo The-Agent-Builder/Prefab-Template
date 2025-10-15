@@ -1,6 +1,6 @@
 [project]
 name = "hello-world-prefab"
-version = "0.1.0"
+version = "0.1.1"
 description = "一个简单的示例预制件，展示了基本功能和多模块结构"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -38,6 +38,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+# 确保 prefab-manifest.json 被包含在 wheel 包中
+[tool.hatch.build.targets.wheel.force-include]
+"prefab-manifest.json" = "prefab-manifest.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

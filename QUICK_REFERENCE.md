@@ -107,24 +107,28 @@ def your_function(param1: str, param2: int = 0) -> dict:
   "parameters": [
     {
       "name": "param1",
-      "type": "str",
+      "type": "string",
       "description": "参数说明",
       "required": true
     },
     {
       "name": "param2",
-      "type": "int",
+      "type": "integer",
       "description": "参数说明",
       "required": false,
       "default": 0
     }
   ],
   "returns": {
-    "type": "dict",
+    "type": "object",
     "description": "返回 {success: bool, result: any} 或 {success: bool, error: str}"
   }
 }
 ```
+
+**类型系统 (v2.2):**
+- 基础类型: `string`, `number`, `integer`, `boolean`, `object`, `array`
+- 平台类型: `InputFile`（输入文件）, `OutputFile`（输出文件）
 
 ## 🐛 故障排查
 

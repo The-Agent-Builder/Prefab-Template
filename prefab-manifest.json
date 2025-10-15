@@ -1,7 +1,16 @@
 {
   "schema_version": "1.0",
   "id": "hello-world-prefab",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "name": "Hello World 示例预制件",
+  "description": "一个简单的示例预制件，展示了基本功能和多模块结构，包含数据分析和视频转音频功能",
+  "tags": [
+    "example",
+    "hello-world",
+    "data-analysis",
+    "video",
+    "audio"
+  ],
   "entry_point": "src/main.py",
   "dependencies_file": "pyproject.toml",
   "functions": [
@@ -11,13 +20,13 @@
       "parameters": [
         {
           "name": "data",
-          "type": "list",
+          "type": "array",
           "description": "数字列表",
           "required": true
         },
         {
           "name": "operation",
-          "type": "str",
+          "type": "string",
           "description": "操作类型：'statistics'(完整统计), 'sum'(求和), 'average'(平均值)",
           "required": false,
           "default": "statistics"
@@ -108,26 +117,34 @@
     {
       "name": "video_to_audio",
       "description": "将视频文件转换为音频文件",
+      "primary_output": "data.output_file",
       "parameters": [
         {
           "name": "video_path",
-          "type": "str",
+          "type": "InputFile",
           "description": "输入视频文件路径",
           "required": true
         },
         {
           "name": "output_path",
-          "type": "str",
+          "type": "string",
           "description": "输出音频文件路径（默认为视频同目录下的同名音频文件）",
           "required": false,
           "default": null
         },
         {
           "name": "audio_format",
-          "type": "str",
+          "type": "string",
           "description": "音频格式：'mp3', 'wav', 'aac', 'flac', 'ogg'",
           "required": false,
-          "default": "mp3"
+          "default": "mp3",
+          "enum": [
+            "mp3",
+            "wav",
+            "aac",
+            "flac",
+            "ogg"
+          ]
         }
       ],
       "returns": {
@@ -148,7 +165,7 @@
                 "description": "输入视频文件路径"
               },
               "output_file": {
-                "type": "string",
+                "type": "OutputFile",
                 "description": "输出音频文件路径"
               },
               "format": {
@@ -190,5 +207,9 @@
         }
       }
     }
-  ]
+  ],
+  "execution_environment": {
+    "cpu": "1",
+    "memory": "512Mi"
+  }
 }

@@ -56,6 +56,9 @@ prefab-template/
 ### 2. 元数据文件（必须同步）
 - `prefab-manifest.json` 必须与 `src/main.py` 保持一致
 - 每个函数的签名、参数、返回值都必须准确描述
+- 使用 **JSON Schema 类型**（`string`, `number`, `integer`, `boolean`, `object`, `array`）
+- 支持平台感知类型：`InputFile`（输入文件）和 `OutputFile`（输出文件）
+- 版本号必须与 `pyproject.toml` 保持一致
 - 运行 `uv run python scripts/validate_manifest.py` 验证一致性
 
 ### 3. 依赖管理
@@ -126,7 +129,7 @@ uv run python scripts/validate_manifest.py
 
 ### 发布流程
 ```bash
-# 1. 更新 prefab-manifest.json 中的 version
+# 1. 更新 prefab-manifest.json 和 pyproject.toml 中的 version（必须一致）
 # 2. 提交代码
 git add .
 git commit -m "Release v1.0.0"
@@ -135,7 +138,7 @@ git commit -m "Release v1.0.0"
 git tag v1.0.0
 git push origin v1.0.0
 
-# GitHub Actions 会自动构建和发布
+# GitHub Actions 会自动构建 .whl 包并发布
 ```
 
 ## AI 助手使用指南
@@ -189,10 +192,11 @@ A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。
 - **版本验证**: 确保 tag 版本与 manifest 版本一致
 - **依赖打包**: 自动下载并打包运行时依赖
 
-### 构建产物
-- 格式: `{id}-{version}.tar.gz`
-- 内容: `src/` + `vendor/` + `prefab-manifest.json`
+### 构建产物（v2 格式）
+- 格式: Python Wheel (`.whl`)
+- 内容: `src/` + `prefab-manifest.json` + 运行时依赖
 - 位置: GitHub Release 附件
+- 优势: 标准 Python 包格式，更好的兼容性
 
 ## 最佳实践
 

@@ -96,12 +96,12 @@ git tag vx.x.x
 git push origin vx.x.x
 
 # 方式二: 手动更新
-# 1. 手动编辑 prefab-manifest.json 和 pyproject.toml 中的 version
+# 1. 手动编辑 prefab-manifest.json 和 pyproject.toml 中的 version（必须保持一致）
 # 2. git tag v1.0.0
 # 3. git push origin v1.0.0
 ```
 
-🎉 GitHub Actions 将自动完成测试、打包和发布！
+🎉 GitHub Actions 将自动完成测试、打包（生成 .whl 格式）和发布！
 
 ## 项目结构
 
@@ -188,7 +188,10 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
 {
   "schema_version": "1.0",           // 清单模式版本（固定）
   "id": "hello-world-prefab",        // 全局唯一的预制件 ID
-  "version": "1.0.0",                // 语义化版本号（与 Git Tag 一致）
+  "version": "1.0.0",                // 语义化版本号（与 pyproject.toml 和 Git Tag 一致）
+  "name": "预制件名称",              // 可读的预制件名称
+  "description": "预制件功能描述",    // 详细功能说明
+  "tags": ["tag1", "tag2"],          // 标签列表，用于分类和搜索
   "entry_point": "src/main.py",      // 入口文件（固定）
   "dependencies_file": "pyproject.toml",  // 依赖文件（固定）
   "functions": [                     // 函数列表
@@ -198,13 +201,13 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
       "parameters": [                // 参数列表
         {
           "name": "data",
-          "type": "list",
+          "type": "array",           // 使用 JSON Schema 类型名
           "description": "数字列表",
           "required": true
         },
         {
           "name": "operation",
-          "type": "str",
+          "type": "string",          // 使用 JSON Schema 类型名
           "description": "操作类型：'statistics', 'sum', 'average'",
           "required": false,
           "default": "statistics"
@@ -236,9 +239,27 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
         }
       }
     }
-  ]
+  ],
+  "execution_environment": {         // 执行环境配置（可选）
+    "cpu": "1",                      // CPU 核心数
+    "memory": "512Mi"                // 内存大小
+  }
 }
 ```
+
+**支持的类型（v2.2 类型系统）：**
+
+*基础类型（对应 JSON Schema）：*
+- `string` - 字符串
+- `number` - 数字（整数或浮点数）
+- `integer` - 整数
+- `boolean` - 布尔值
+- `object` - 对象/字典
+- `array` - 数组/列表
+
+*平台感知类型（用于文件处理）：*
+- `InputFile` - 输入文件（平台会自动下载并传递本地路径）
+- `OutputFile` - 输出文件（平台会自动上传返回的文件路径）
 
 ### 依赖管理
 
@@ -358,9 +379,13 @@ graph LR
 
 ### 发布产物
 
-- **格式**: `{id}-{version}.tar.gz`（例如 `hello-world-prefab-1.0.0.tar.gz`）
-- **内容**: `src/` 目录 + `prefab-manifest.json` + `vendor/`（依赖）
+- **格式**: Python Wheel (`.whl`)（例如 `hello_world_prefab-0.1.0-py3-none-any.whl`）
+- **内容**: 
+  - `src/` 目录（包含所有源代码）
+  - `prefab-manifest.json`（元数据文件）
+  - 所有运行时依赖（自动包含）
 - **位置**: GitHub Release 附件
+- **优势**: 标准 Python 包格式，兼容性更好，安装更便捷
 
 ## 示例预制件
 
