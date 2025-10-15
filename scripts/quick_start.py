@@ -108,14 +108,14 @@ def main():
     # 4. 运行测试
     print_header("运行测试")
     results.append(run_command(
-        "uv run pytest tests/ -v",
+        "uv run --with pytest pytest tests/ -v",
         "运行单元测试"
     ))
     
     # 5. 代码风格检查
     print_header("代码风格检查")
     results.append(run_command(
-        "uv run flake8 src/ --max-line-length=120",
+        "uv run --with flake8 flake8 src/ --max-line-length=120",
         "Flake8 代码风格检查"
     ))
     
