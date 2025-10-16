@@ -7,13 +7,13 @@
 2. 函数参数的数量和名称匹配
 3. manifest.json 的格式正确
 4. 类型系统符合 v2.2 规范
+5. secrets 字段符合 v3.0 规范
 """
 
 import json
 import sys
-import os
 import ast
-import inspect
+import re
 from pathlib import Path
 
 # v2.2 类型系统定义
@@ -29,6 +29,9 @@ VALID_TYPES = {
     'InputFile',
     'OutputFile'
 }
+
+# v3.0 secrets 名称格式（大写字母、数字和下划线）
+SECRET_NAME_PATTERN = re.compile(r'^[A-Z0-9_]+$')
 
 
 def load_manifest():
@@ -65,8 +68,8 @@ def extract_function_signatures(main_py_path):
         if isinstance(node, ast.FunctionDef):
             # 只提取模块级别的函数（不在类内部）
             if isinstance(node.parent if hasattr(node, 'parent') else None, ast.Module) or \
-               not any(isinstance(parent, ast.ClassDef) for parent in ast.walk(tree)
-                      if hasattr(parent, 'body') and node in getattr(parent, 'body', [])):
+                    not any(isinstance(parent, ast.ClassDef) for parent in ast.walk(tree)
+                            if hasattr(parent, 'body') and node in getattr(parent, 'body', [])):
                 params = []
                 defaults_start = len(node.args.args) - len(node.args.defaults)
 
@@ -149,6 +152,61 @@ def validate_type_system(manifest):
             errors.extend(return_errors)
 
     return errors
+
+
+def validate_secrets(manifest):
+    """验证 manifest 中的 secrets 字段符合 v3.0 规范"""
+    errors = []
+    warnings = []
+
+    for func in manifest.get('functions', []):
+        func_name = func.get('name', 'unknown')
+        secrets = func.get('secrets', [])
+
+        if not isinstance(secrets, list):
+            errors.append(f"函数 '{func_name}': secrets 必须是数组类型")
+            continue
+
+        for i, secret in enumerate(secrets):
+            if not isinstance(secret, dict):
+                errors.append(f"函数 '{func_name}': secrets[{i}] 必须是对象类型")
+                continue
+
+            # 验证 name 字段
+            if 'name' not in secret:
+                errors.append(f"函数 '{func_name}': secrets[{i}] 缺少必需的 'name' 字段")
+            else:
+                secret_name = secret['name']
+                if not isinstance(secret_name, str):
+                    errors.append(f"函数 '{func_name}': secret 的 'name' 必须是字符串类型")
+                elif not SECRET_NAME_PATTERN.match(secret_name):
+                    errors.append(
+                        f"函数 '{func_name}': secret 名称 '{secret_name}' 不符合规范，"
+                        f"必须只包含大写字母、数字和下划线 (例如: API_KEY, DATABASE_URL)"
+                    )
+
+            # 验证 description 字段
+            if 'description' not in secret:
+                errors.append(f"函数 '{func_name}': secrets[{i}] 缺少必需的 'description' 字段")
+            elif not isinstance(secret.get('description'), str):
+                errors.append(f"函数 '{func_name}': secret 的 'description' 必须是字符串类型")
+
+            # 验证 required 字段
+            if 'required' not in secret:
+                errors.append(f"函数 '{func_name}': secrets[{i}] 缺少必需的 'required' 字段")
+            elif not isinstance(secret.get('required'), bool):
+                errors.append(f"函数 '{func_name}': secret 的 'required' 必须是布尔类型")
+
+            # 检查 instructions 字段（可选但推荐）
+            if 'instructions' not in secret:
+                warnings.append(
+                    f"函数 '{func_name}': secret '{secret.get('name', 'unknown')}' 建议添加 'instructions' 字段，"
+                    f"帮助用户了解如何获取该密钥"
+                )
+            elif secret.get('instructions') and not isinstance(secret['instructions'], str):
+                errors.append(f"函数 '{func_name}': secret 的 'instructions' 必须是字符串类型")
+
+    return errors, warnings
 
 
 def validate_functions(manifest, actual_functions):
@@ -240,6 +298,16 @@ def main():
 
     print("✅ 类型系统验证通过（v2.2 规范）")
 
+    # 验证 secrets 字段（v3.0）
+    secret_errors, secret_warnings = validate_secrets(manifest)
+    if secret_errors:
+        print("\n❌ Secrets 验证失败:")
+        for error in secret_errors:
+            print(f"  - {error}")
+        sys.exit(1)
+
+    print("✅ Secrets 字段验证通过（v3.0 规范）")
+
     # 提取实际函数签名
     main_py_path = Path("src/main.py")
     actual_functions = extract_function_signatures(main_py_path)
@@ -249,17 +317,20 @@ def main():
     print(f"✅ 成功解析 main.py，发现 {len(actual_functions)} 个函数")
 
     # 验证函数一致性
-    errors, warnings = validate_functions(manifest, actual_functions)
+    func_errors, func_warnings = validate_functions(manifest, actual_functions)
+
+    # 合并所有警告
+    all_warnings = secret_warnings + func_warnings
 
     # 输出结果
-    if warnings:
+    if all_warnings:
         print("\n⚠️  警告:")
-        for warning in warnings:
+        for warning in all_warnings:
             print(f"  - {warning}")
 
-    if errors:
+    if func_errors:
         print("\n❌ 错误:")
-        for error in errors:
+        for error in func_errors:
             print(f"  - {error}")
         print("\n验证失败! 请修复上述错误。")
         sys.exit(1)
@@ -270,4 +341,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

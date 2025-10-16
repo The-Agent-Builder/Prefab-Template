@@ -157,6 +157,67 @@
           }
         }
       }
+    },
+    {
+      "name": "fetch_weather",
+      "description": "获取指定城市的天气信息（演示如何使用 secrets）",
+      "parameters": [
+        {
+          "name": "city",
+          "type": "string",
+          "description": "要查询天气的城市名称，例如 '北京'",
+          "required": true
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "包含天气信息的对象",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市名称（成功时）",
+            "optional": true
+          },
+          "temperature": {
+            "type": "number",
+            "description": "摄氏温度（成功时）",
+            "optional": true
+          },
+          "condition": {
+            "type": "string",
+            "description": "天气状况，例如 '晴天'（成功时）",
+            "optional": true
+          },
+          "note": {
+            "type": "string",
+            "description": "备注信息（成功时）",
+            "optional": true
+          },
+          "error": {
+            "type": "string",
+            "description": "错误信息（失败时）",
+            "optional": true
+          },
+          "error_code": {
+            "type": "string",
+            "description": "错误代码（失败时）",
+            "optional": true,
+            "enum": ["MISSING_API_KEY", "INVALID_CITY", "UNEXPECTED_ERROR"]
+          }
+        }
+      },
+      "secrets": [
+        {
+          "name": "WEATHER_API_KEY",
+          "description": "用于认证天气服务的 API 密钥",
+          "instructions": "这是一个演示示例。在实际使用中，您需要访问天气服务提供商的网站（例如 https://www.weather-provider.com/api-keys）注册并获取您的免费 API Key。",
+          "required": true
+        }
+      ]
     }
   ],
   "execution_environment": {

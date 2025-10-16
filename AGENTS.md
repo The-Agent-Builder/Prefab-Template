@@ -18,9 +18,9 @@
 - **包管理**: uv (现代化的 Python 包管理器)
 - **测试**: pytest
 - **代码检查**: flake8
-- **构建**: hatchling
+- **构建**: setuptools (v3.0 更新)
 - **CI/CD**: GitHub Actions
-- **配置**: pyproject.toml (PEP 621)
+- **配置**: pyproject.toml (PEP 621) + prefab-manifest.json (v3.0 架构)
 
 ## 项目结构
 
@@ -58,6 +58,7 @@ prefab-template/
 - 每个函数的签名、参数、返回值都必须准确描述
 - 使用 **JSON Schema 类型**（`string`, `number`, `integer`, `boolean`, `object`, `array`）
 - 支持平台感知类型：`InputFile`（输入文件）和 `OutputFile`（输出文件）
+- 支持 **secrets 字段**（v3.0 新特性）：用于声明函数所需的密钥
 - 版本号必须与 `pyproject.toml` 保持一致
 - 运行 `uv run python scripts/validate_manifest.py` 验证一致性
 
@@ -99,6 +100,51 @@ def function_name(param1: str, param2: int = 0) -> dict:
             "error": str(e)
         }
 ```
+
+### 5. Secrets 管理规范（v3.0 新特性）
+
+如果函数需要使用 API Key、数据库连接等敏感信息：
+
+**在 manifest.json 中声明：**
+```json
+{
+  "functions": [{
+    "name": "fetch_weather",
+    "secrets": [
+      {
+        "name": "WEATHER_API_KEY",
+        "description": "天气服务 API 密钥",
+        "instructions": "请访问 https://api.weather.com/keys 获取",
+        "required": true
+      }
+    ]
+  }]
+}
+```
+
+**在代码中使用：**
+```python
+import os
+
+def fetch_weather(city: str) -> dict:
+    # 从环境变量获取（平台自动注入）
+    api_key = os.environ.get('WEATHER_API_KEY')
+    
+    if not api_key:
+        return {
+            "success": False,
+            "error": "未配置 WEATHER_API_KEY",
+            "error_code": "MISSING_API_KEY"
+        }
+    
+    # 使用 API Key...
+```
+
+**Secrets 字段规范：**
+- `name`: 必需，大写字母+数字+下划线（如 `API_KEY`）
+- `description`: 必需，简短说明密钥用途
+- `instructions`: 推荐，指导用户如何获取密钥
+- `required`: 必需，布尔值，标识是否为必需
 
 ## 开发工作流
 
@@ -171,7 +217,7 @@ uv add --dev package-name
 A: `src/main.py` 和 `prefab-manifest.json` 的位置和作用不可更改，但可以在 `src/` 下添加更多模块。
 
 **Q: 如何处理敏感信息？**  
-A: 通过函数参数传递，不要硬编码。在 README 中说明需要的环境变量。
+A: **推荐使用 v3.0 的 secrets 功能**。在 `prefab-manifest.json` 中声明 `secrets` 字段，平台会自动引导用户配置并注入到环境变量。参见本文档的 "Secrets 管理规范" 章节和 `fetch_weather` 示例。
 
 **Q: CI/CD 失败怎么办？**  
 A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。本地运行验证脚本排查。

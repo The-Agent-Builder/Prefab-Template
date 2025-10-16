@@ -32,6 +32,7 @@
 - 🚀 **自动化 CI/CD**: 一键测试、打包、发布
 - 📦 **依赖管理**: 自动打包运行时依赖
 - 🔒 **质量保证**: 强制性的代码检查和测试
+- 🔐 **密钥管理**: 完善的 secrets 支持（v3.0 新特性）
 
 ## 快速开始
 
@@ -261,6 +262,63 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
 - `InputFile` - 输入文件（平台会自动下载并传递本地路径）
 - `OutputFile` - 输出文件（平台会自动上传返回的文件路径）
 
+### 密钥管理（Secrets）- v3.0 新特性
+
+如果你的预制件需要使用 API Key、数据库连接字符串等敏感信息，可以在函数定义中声明 `secrets` 字段。平台会引导用户配置这些密钥，并在运行时自动注入到环境变量中。
+
+**在 manifest.json 中声明 secrets：**
+
+```json
+{
+  "functions": [
+    {
+      "name": "fetch_weather",
+      "description": "获取城市天气信息",
+      "parameters": [...],
+      "secrets": [
+        {
+          "name": "WEATHER_API_KEY",
+          "description": "用于认证天气服务的 API 密钥",
+          "instructions": "请访问 https://www.weather-provider.com/api-keys 注册并获取您的免费 API Key",
+          "required": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+**在代码中使用 secrets：**
+
+```python
+import os
+
+def fetch_weather(city: str) -> dict:
+    """获取城市天气信息"""
+    # 从环境变量中读取密钥（平台会自动注入）
+    api_key = os.environ.get('WEATHER_API_KEY')
+    
+    if not api_key:
+        return {
+            "success": False,
+            "error": "未配置 WEATHER_API_KEY",
+            "error_code": "MISSING_API_KEY"
+        }
+    
+    # 使用 API Key 调用第三方服务
+    # response = requests.get(api_url, headers={"Authorization": f"Bearer {api_key}"})
+    ...
+```
+
+**Secrets 字段规范：**
+
+- `name` (必需): 密钥名称，必须是大写字母、数字和下划线（如 `API_KEY`, `DATABASE_URL`）
+- `description` (必需): 密钥用途的简短描述
+- `instructions` (推荐): 指导用户如何获取该密钥的说明
+- `required` (必需): 布尔值，标识该密钥是否为必需
+
+本模板包含完整的 secrets 使用示例，详见 `src/main.py` 中的 `fetch_weather` 函数。
+
 ### 依赖管理
 
 在 `pyproject.toml` 中添加你的依赖：
@@ -441,10 +499,15 @@ uv add --dev pytest-mock
 
 ### Q: 如何处理敏感信息（如 API Key）？
 
-**A**: 
-1. 通过函数参数传递（推荐）
-2. 使用环境变量，并在 README 中说明配置要求
+**A**: 推荐使用 v3.0 新增的 `secrets` 功能：
+
+1. **在 manifest.json 中声明密钥**（推荐）- 平台会引导用户配置，并自动注入到环境变量
+2. 通过函数参数传递 - 适用于非敏感的配置项
 3. **绝对不要**将密钥硬编码到代码中
+
+**示例：** 参见本模板的 `fetch_weather` 函数及其 manifest 配置。
+
+更多信息请参阅上方的 [密钥管理](#密钥管理secrets---v30-新特性) 章节。
 
 ### Q: 可以添加多个 `.py` 文件吗？
 
