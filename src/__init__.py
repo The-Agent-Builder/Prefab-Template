@@ -1,12 +1,19 @@
 """
-预制件主模块
+预制件模块
 
-导出所有可被 AI 调用的函数
+这个模块暴露所有可被 AI 调用的函数。
 """
 
-from .main import analyze_dataset, video_to_audio
+from .main import (
+    greet,
+    echo,
+    add_numbers,
+)
 
 __all__ = [
-    'analyze_dataset',
-    'video_to_audio'
+    "greet",
+    "echo",
+    "add_numbers",
 ]
+
+__version__ = "0.1.0"

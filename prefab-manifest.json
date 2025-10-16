@@ -1,215 +1,166 @@
 {
   "schema_version": "1.0",
   "id": "hello-world-prefab",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "name": "Hello World 示例预制件",
-  "description": "一个简单的示例预制件，展示了基本功能和多模块结构，包含数据分析和视频转音频功能",
+  "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数",
   "tags": [
     "example",
     "hello-world",
-    "data-analysis",
-    "video",
-    "audio"
+    "tutorial"
   ],
   "entry_point": "src/main.py",
   "dependencies_file": "pyproject.toml",
   "functions": [
     {
-      "name": "analyze_dataset",
-      "description": "分析数据集并返回统计结果",
+      "name": "greet",
+      "description": "向用户问候",
       "parameters": [
         {
-          "name": "data",
-          "type": "array",
-          "description": "数字列表",
-          "required": true
-        },
-        {
-          "name": "operation",
+          "name": "name",
           "type": "string",
-          "description": "操作类型：'statistics'(完整统计), 'sum'(求和), 'average'(平均值)",
+          "description": "要问候的名字",
           "required": false,
-          "default": "statistics"
+          "default": "World"
         }
       ],
       "returns": {
         "type": "object",
-        "description": "返回结果对象",
+        "description": "包含问候结果的对象",
         "properties": {
           "success": {
             "type": "boolean",
             "description": "操作是否成功"
           },
-          "data": {
-            "type": "object",
-            "description": "成功时的结果数据（仅在 success=true 时存在）",
-            "optional": true,
-            "properties": {
-              "operation": {
-                "type": "string",
-                "description": "执行的操作类型"
-              },
-              "value": {
-                "type": "number",
-                "description": "计算结果值（sum 或 average 操作）",
-                "optional": true
-              },
-              "count": {
-                "type": "integer",
-                "description": "数据点数量",
-                "optional": true
-              },
-              "statistics": {
-                "type": "object",
-                "description": "统计信息（statistics 操作，使用 numpy 计算）",
-                "optional": true,
-                "properties": {
-                  "count": {
-                    "type": "integer",
-                    "description": "数据点数量"
-                  },
-                  "sum": {
-                    "type": "number",
-                    "description": "总和"
-                  },
-                  "average": {
-                    "type": "number",
-                    "description": "平均值"
-                  },
-                  "max": {
-                    "type": "number",
-                    "description": "最大值"
-                  },
-                  "min": {
-                    "type": "number",
-                    "description": "最小值"
-                  },
-                  "std": {
-                    "type": "number",
-                    "description": "标准差"
-                  },
-                  "variance": {
-                    "type": "number",
-                    "description": "方差"
-                  }
-                }
-              }
-            }
+          "message": {
+            "type": "string",
+            "description": "问候消息（成功时）",
+            "optional": true
+          },
+          "name": {
+            "type": "string",
+            "description": "问候的名字（成功时）",
+            "optional": true
           },
           "error": {
             "type": "string",
-            "description": "错误信息（仅在 success=false 时存在）",
+            "description": "错误信息（失败时）",
             "optional": true
           },
           "error_code": {
             "type": "string",
-            "description": "错误代码（仅在 success=false 时存在）",
+            "description": "错误代码（失败时）",
             "optional": true,
-            "enum": [
-              "EMPTY_DATA",
-              "INVALID_OPERATION",
-              "UNEXPECTED_ERROR"
-            ]
+            "enum": ["INVALID_NAME", "UNEXPECTED_ERROR"]
           }
         }
       }
     },
     {
-      "name": "video_to_audio",
-      "description": "将视频文件转换为音频文件",
-      "primary_output": "data.output_file",
+      "name": "echo",
+      "description": "回显输入的文本",
       "parameters": [
         {
-          "name": "video_path",
-          "type": "InputFile",
-          "description": "输入视频文件路径",
+          "name": "text",
+          "type": "string",
+          "description": "要回显的文本",
           "required": true
-        },
-        {
-          "name": "output_path",
-          "type": "string",
-          "description": "输出音频文件路径（默认为视频同目录下的同名音频文件）",
-          "required": false,
-          "default": null
-        },
-        {
-          "name": "audio_format",
-          "type": "string",
-          "description": "音频格式：'mp3', 'wav', 'aac', 'flac', 'ogg'",
-          "required": false,
-          "default": "mp3",
-          "enum": [
-            "mp3",
-            "wav",
-            "aac",
-            "flac",
-            "ogg"
-          ]
         }
       ],
       "returns": {
         "type": "object",
-        "description": "返回转换结果对象",
+        "description": "包含回显结果的对象",
         "properties": {
           "success": {
             "type": "boolean",
             "description": "操作是否成功"
           },
-          "data": {
-            "type": "object",
-            "description": "成功时的转换结果数据",
-            "optional": true,
-            "properties": {
-              "input_file": {
-                "type": "string",
-                "description": "输入视频文件路径"
-              },
-              "output_file": {
-                "type": "OutputFile",
-                "description": "输出音频文件路径"
-              },
-              "format": {
-                "type": "string",
-                "description": "输出音频格式"
-              },
-              "duration": {
-                "type": "number",
-                "description": "音频时长（秒）"
-              },
-              "sample_rate": {
-                "type": "number",
-                "description": "音频采样率"
-              }
-            }
+          "original": {
+            "type": "string",
+            "description": "原始文本（成功时）",
+            "optional": true
+          },
+          "echo": {
+            "type": "string",
+            "description": "回显的文本（成功时）",
+            "optional": true
+          },
+          "length": {
+            "type": "integer",
+            "description": "文本长度（成功时）",
+            "optional": true
           },
           "error": {
             "type": "string",
-            "description": "错误信息（仅在 success=false 时存在）",
+            "description": "错误信息（失败时）",
             "optional": true
           },
           "error_code": {
             "type": "string",
-            "description": "错误代码（仅在 success=false 时存在）",
+            "description": "错误代码（失败时）",
             "optional": true,
-            "enum": [
-              "FILE_NOT_FOUND",
-              "INVALID_FORMAT",
-              "NO_AUDIO_TRACK",
-              "DEPENDENCY_MISSING",
-              "CONVERSION_FAILED"
-            ]
+            "enum": ["EMPTY_TEXT", "UNEXPECTED_ERROR"]
+          }
+        }
+      }
+    },
+    {
+      "name": "add_numbers",
+      "description": "计算两个数字的和",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "number",
+          "description": "第一个数字",
+          "required": true
+        },
+        {
+          "name": "b",
+          "type": "number",
+          "description": "第二个数字",
+          "required": true
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "包含计算结果的对象",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
           },
-          "supported_formats": {
-            "type": "array",
-            "description": "支持的音频格式列表（仅在 error_code=INVALID_FORMAT 时存在）",
+          "a": {
+            "type": "number",
+            "description": "第一个数字（成功时）",
             "optional": true
+          },
+          "b": {
+            "type": "number",
+            "description": "第二个数字（成功时）",
+            "optional": true
+          },
+          "sum": {
+            "type": "number",
+            "description": "计算结果（成功时）",
+            "optional": true
+          },
+          "error": {
+            "type": "string",
+            "description": "错误信息（失败时）",
+            "optional": true
+          },
+          "error_code": {
+            "type": "string",
+            "description": "错误代码（失败时）",
+            "optional": true,
+            "enum": ["CALCULATION_ERROR", "UNEXPECTED_ERROR"]
           }
         }
       }
     }
   ],
   "execution_environment": {
-    "cpu": "1",
-    "memory": "512Mi"
+    "cpu": "500m",
+    "memory": "256Mi"
   }
 }

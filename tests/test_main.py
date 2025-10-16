@@ -1,7 +1,7 @@
 """
 main.py 的单元测试
 
-确保所有预制件函数都能正常工作
+测试所有预制件函数的功能
 """
 
 import sys
@@ -10,68 +10,86 @@ import os
 # 添加项目根目录到 Python 路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src import analyze_dataset
+from src.main import greet, echo, add_numbers
 
 
-class TestAnalyzeDataset:
-    """测试 analyze_dataset 函数"""
+class TestGreet:
+    """测试 greet 函数"""
 
-    def test_statistics_operation(self):
-        """测试统计操作"""
-        result = analyze_dataset([1, 2, 3, 4, 5], "statistics")
+    def test_default_greeting(self):
+        """测试默认问候"""
+        result = greet()
         assert result["success"] is True
-        assert "data" in result
-        assert result["data"]["operation"] == "statistics"
-        assert result["data"]["statistics"]["count"] == 5
-        assert result["data"]["statistics"]["average"] == 3.0
-        assert result["data"]["statistics"]["max"] == 5
-        assert result["data"]["statistics"]["min"] == 1
+        assert result["message"] == "Hello, World!"
+        assert result["name"] == "World"
 
-    def test_sum_operation(self):
-        """测试求和操作"""
-        result = analyze_dataset([10, 20, 30], "sum")
+    def test_custom_name(self):
+        """测试自定义名字"""
+        result = greet(name="Alice")
         assert result["success"] is True
-        assert result["data"]["operation"] == "sum"
-        assert result["data"]["value"] == 60
-        assert result["data"]["count"] == 3
+        assert result["message"] == "Hello, Alice!"
+        assert result["name"] == "Alice"
 
-    def test_average_operation(self):
-        """测试平均值操作"""
-        result = analyze_dataset([2, 4, 6], "average")
-        assert result["success"] is True
-        assert result["data"]["operation"] == "average"
-        assert result["data"]["value"] == 4.0
-        assert result["data"]["count"] == 3
-
-    def test_default_operation(self):
-        """测试默认操作（statistics）"""
-        result = analyze_dataset([1, 2, 3])
-        assert result["success"] is True
-        assert result["data"]["operation"] == "statistics"
-
-    def test_empty_data(self):
-        """测试空数据集"""
-        result = analyze_dataset([])
+    def test_empty_name(self):
+        """测试空名字"""
+        result = greet(name="")
         assert result["success"] is False
-        assert result["error"] == "数据集不能为空"
-        assert result["error_code"] == "EMPTY_DATA"
+        assert "error" in result
+        assert result["error_code"] == "INVALID_NAME"
 
-    def test_invalid_operation(self):
-        """测试无效操作类型"""
-        result = analyze_dataset([1, 2, 3], "invalid_op")
+
+class TestEcho:
+    """测试 echo 函数"""
+
+    def test_basic_echo(self):
+        """测试基本回显"""
+        result = echo(text="Hello")
+        assert result["success"] is True
+        assert result["original"] == "Hello"
+        assert result["echo"] == "Hello"
+        assert result["length"] == 5
+
+    def test_long_text(self):
+        """测试长文本"""
+        text = "This is a longer text message for testing"
+        result = echo(text=text)
+        assert result["success"] is True
+        assert result["original"] == text
+        assert result["length"] == len(text)
+
+    def test_empty_text(self):
+        """测试空文本"""
+        result = echo(text="")
         assert result["success"] is False
-        assert "不支持的操作类型" in result["error"]
-        assert result["error_code"] == "INVALID_OPERATION"
+        assert "error" in result
+        assert result["error_code"] == "EMPTY_TEXT"
+
+
+class TestAddNumbers:
+    """测试 add_numbers 函数"""
+
+    def test_positive_integers(self):
+        """测试正整数"""
+        result = add_numbers(a=5, b=3)
+        assert result["success"] is True
+        assert result["a"] == 5
+        assert result["b"] == 3
+        assert result["sum"] == 8
 
     def test_negative_numbers(self):
         """测试负数"""
-        result = analyze_dataset([-5, -2, 0, 3, 7], "statistics")
+        result = add_numbers(a=-5, b=3)
         assert result["success"] is True
-        assert result["data"]["statistics"]["sum"] == 3
-        assert result["data"]["statistics"]["average"] == 0.6
+        assert result["sum"] == -2
 
     def test_float_numbers(self):
         """测试浮点数"""
-        result = analyze_dataset([1.5, 2.5, 3.5], "average")
+        result = add_numbers(a=1.5, b=2.3)
         assert result["success"] is True
-        assert result["data"]["value"] == 2.5
+        assert abs(result["sum"] - 3.8) < 0.0001
+
+    def test_zero(self):
+        """测试零"""
+        result = add_numbers(a=0, b=0)
+        assert result["success"] is True
+        assert result["sum"] == 0
