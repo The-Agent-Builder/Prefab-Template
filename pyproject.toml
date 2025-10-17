@@ -37,6 +37,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
+# 确保 prefab-manifest.json 被包含在 wheel 包中
+[tool.hatch.build.targets.wheel.force-include]
+"prefab-manifest.json" = "prefab-manifest.json"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

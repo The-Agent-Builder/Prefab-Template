@@ -104,16 +104,24 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+# 确保 prefab-manifest.json 被包含在 wheel 包中
+[tool.hatch.build.targets.wheel.force-include]
+"prefab-manifest.json" = "prefab-manifest.json"
 ```
 
-**减少了 5 行配置，更加清晰直观！**
+**减少了 3 行配置，更加清晰直观！**
+
+**注意**：虽然 hatchling 会自动包含 `src/` 目录下的所有文件，但 `prefab-manifest.json` 位于项目根目录，因此需要用 `force-include` 显式声明。这比 setuptools 的 `package-data` 配置更直观易懂。
 
 #### 2. 无需 MANIFEST.in
 
 hatchling 会自动包含 `src/` 目录下的所有文件，包括：
 - Python 源文件 (`.py`)
-- JSON 配置文件 (`prefab-manifest.json`)
+- JSON 配置文件
 - 其他资源文件
+
+对于根目录的 `prefab-manifest.json`，使用 `force-include` 显式声明即可，无需复杂的 MANIFEST.in 配置。
 
 #### 3. 验证构建产物
 
@@ -204,7 +212,7 @@ python -c "import src"
 
 | 特性 | setuptools | hatchling | 胜者 |
 |-----|-----------|-----------|------|
-| 配置行数 | ~9 行 | ~4 行 | ✅ hatchling |
+| 配置行数 | ~9 行 | ~6 行 | ✅ hatchling |
 | 自动包含非 Python 文件 | ❌ 需要配置 | ✅ 自动 | ✅ hatchling |
 | 学习曲线 | 陡峭 | 平缓 | ✅ hatchling |
 | 现代化 | 传统工具 | 现代工具 | ✅ hatchling |
@@ -223,8 +231,8 @@ python -c "import src"
 
 setuptools 虽然是 Python 生态的"老兵"，但在简单项目中反而增加了不必要的复杂性。hatchling 作为现代化构建工具，提供了：
 
-✅ **更简洁的配置** - 4 行 vs 9 行  
-✅ **更智能的默认行为** - 自动包含所有必要文件  
+✅ **更简洁的配置** - 6 行 vs 9 行（减少 33%）  
+✅ **更清晰的语义** - `force-include` 比 `package-data` 更直观  
 ✅ **更好的开发体验** - 配置即文档，错误信息清晰  
 ✅ **更强的未来兼容性** - 符合最新 Python 打包标准
 
