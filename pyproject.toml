@@ -31,16 +31,11 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-# 确保 prefab-manifest.json 被打包进 wheel 文件中
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["src*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.json"]
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
