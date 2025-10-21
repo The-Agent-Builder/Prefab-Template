@@ -159,6 +159,77 @@
       }
     },
     {
+      "name": "process_text_file",
+      "description": "处理文本文件（演示文件输入输出）",
+      "parameters": [
+        {
+          "name": "input_files",
+          "type": "array",
+          "items": {
+            "type": "InputFile"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "description": "输入文本文件（只需要1个）",
+          "required": true
+        },
+        {
+          "name": "operation",
+          "type": "string",
+          "description": "操作类型（uppercase, lowercase, reverse）",
+          "required": false,
+          "default": "uppercase",
+          "enum": ["uppercase", "lowercase", "reverse"]
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "包含处理结果的对象",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
+          },
+          "input_file": {
+            "type": "string",
+            "description": "输入文件名（成功时）",
+            "optional": true
+          },
+          "output_file": {
+            "type": "string",
+            "description": "输出文件路径（成功时）",
+            "optional": true
+          },
+          "operation": {
+            "type": "string",
+            "description": "执行的操作（成功时）",
+            "optional": true
+          },
+          "original_length": {
+            "type": "integer",
+            "description": "原始文本长度（成功时）",
+            "optional": true
+          },
+          "processed_length": {
+            "type": "integer",
+            "description": "处理后文本长度（成功时）",
+            "optional": true
+          },
+          "error": {
+            "type": "string",
+            "description": "错误信息（失败时）",
+            "optional": true
+          },
+          "error_code": {
+            "type": "string",
+            "description": "错误代码（失败时）",
+            "optional": true,
+            "enum": ["FILE_NOT_FOUND", "INVALID_OPERATION", "PROCESSING_ERROR"]
+          }
+        }
+      }
+    },
+    {
       "name": "fetch_weather",
       "description": "获取指定城市的天气信息（演示如何使用 secrets）",
       "parameters": [

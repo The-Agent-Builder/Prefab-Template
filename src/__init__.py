@@ -1,19 +1,15 @@
 """
-预制件模块
+预制件模块导出
 
-这个模块暴露所有可被 AI 调用的函数。
+这个文件定义了预制件对外暴露的函数列表。
 """
 
-from .main import (
-    greet,
-    echo,
-    add_numbers,
-)
+from .main import greet, echo, add_numbers, process_text_file, fetch_weather
 
 __all__ = [
     "greet",
     "echo",
     "add_numbers",
+    "process_text_file",
+    "fetch_weather",
 ]
-
-__version__ = "0.1.0"
