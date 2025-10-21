@@ -3,7 +3,7 @@
   "id": "hello-world-prefab",
   "version": "0.1.0",
   "name": "Hello World 示例预制件",
-  "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数",
+  "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数（v3.0 架构）",
   "tags": [
     "example",
     "hello-world",
@@ -160,19 +160,27 @@
     },
     {
       "name": "process_text_file",
-      "description": "处理文本文件（演示文件输入输出）",
-      "parameters": [
-        {
-          "name": "input_files",
+      "description": "处理文本文件（演示文件输入输出，v3.0 架构）",
+      "files": {
+        "input": {
           "type": "array",
           "items": {
             "type": "InputFile"
           },
           "minItems": 1,
           "maxItems": 1,
-          "description": "输入文本文件（只需要1个）",
+          "description": "输入文本文件",
           "required": true
         },
+        "output": {
+          "type": "array",
+          "items": {
+            "type": "OutputFile"
+          },
+          "description": "处理后的文本文件"
+        }
+      },
+      "parameters": [
         {
           "name": "operation",
           "type": "string",
@@ -184,21 +192,11 @@
       ],
       "returns": {
         "type": "object",
-        "description": "包含处理结果的对象",
+        "description": "包含处理结果的对象（不包含文件路径）",
         "properties": {
           "success": {
             "type": "boolean",
             "description": "操作是否成功"
-          },
-          "input_file": {
-            "type": "string",
-            "description": "输入文件名（成功时）",
-            "optional": true
-          },
-          "output_file": {
-            "type": "string",
-            "description": "输出文件路径（成功时）",
-            "optional": true
           },
           "operation": {
             "type": "string",
@@ -224,7 +222,7 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["FILE_NOT_FOUND", "INVALID_OPERATION", "PROCESSING_ERROR"]
+            "enum": ["NO_INPUT_FILE", "FILE_NOT_FOUND", "INVALID_OPERATION", "PROCESSING_ERROR"]
           }
         }
       }

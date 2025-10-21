@@ -132,36 +132,40 @@ def add_numbers(a: float, b: float) -> dict:
         }
 
 
-def process_text_file(input_files: List[str], operation: str = "uppercase") -> dict:
+def process_text_file(operation: str = "uppercase") -> dict:
     """
-    处理文本文件（文件处理示例）
+    处理文本文件（文件处理示例，v3.0 架构）
 
-    这个函数演示了如何处理文件输入和输出。
+    这个函数演示了 v3.0 的文件处理方式：
+    - 文件不再作为参数传入
+    - Gateway 自动下载到 data/inputs/
+    - Prefab 自动扫描 data/inputs/
+    - 输出写入 data/outputs/
+    - Gateway 自动上传并在响应中返回文件 URL
 
-    📁 文件约定：
-    - 输入：Gateway 下载到 data/inputs/<文件名>，传入文件名列表
-    - 输出：写入 data/outputs/<文件名>，返回相对路径
-    - Gateway 会自动上传 data/outputs/ 中的文件并替换路径为 S3 URL
+    📁 v3.0 文件约定：
+    - 输入：自动扫描 data/inputs/（Gateway 已下载）
+    - 输出：写入 data/outputs/（Gateway 会自动上传）
+    - 返回值：不包含文件路径（由 Gateway 管理）
 
     Args:
-        input_files: 输入文件名列表（只取第一个）
         operation: 操作类型（uppercase, lowercase, reverse）
 
     Returns:
-        包含处理结果的字典
+        包含处理结果的字典（不包含文件路径）
     """
     try:
-        # 获取第一个输入文件
-        input_filename = input_files[0]
-        input_path = DATA_INPUTS / input_filename
-
-        # 验证文件存在
-        if not input_path.exists():
+        # v3.0: 自动扫描 data/inputs 目录
+        input_files = list(DATA_INPUTS.glob("*"))
+        if not input_files:
             return {
                 "success": False,
-                "error": f"输入文件不存在: {input_filename}",
-                "error_code": "FILE_NOT_FOUND"
+                "error": "未找到输入文件",
+                "error_code": "NO_INPUT_FILE"
             }
+
+        # 获取第一个文件
+        input_path = input_files[0]
 
         # 读取文件内容
         content = input_path.read_text(encoding="utf-8")
@@ -183,16 +187,14 @@ def process_text_file(input_files: List[str], operation: str = "uppercase") -> d
         # 确保输出目录存在
         DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
 
-        # 写入输出文件
-        output_filename = f"processed_{input_filename}"
+        # v3.0: 写入输出文件（Gateway 会自动上传）
+        output_filename = f"processed_{input_path.name}"
         output_path = DATA_OUTPUTS / output_filename
         output_path.write_text(result, encoding="utf-8")
 
-        # 返回结果（相对路径，Gateway 会自动替换为 S3 URL）
+        # v3.0: 返回结果（不包含文件路径）
         return {
             "success": True,
-            "input_file": input_filename,
-            "output_file": f"data/outputs/{output_filename}",
             "operation": operation,
             "original_length": len(content),
             "processed_length": len(result)

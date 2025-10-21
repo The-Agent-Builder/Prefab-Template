@@ -89,63 +89,60 @@ class TestFileHandling:
         shutil.rmtree(temp_dir)
 
     def test_process_text_file_uppercase(self, workspace):
-        """测试文本转大写"""
-        result = process_text_file(
-            input_files=["test.txt"],
-            operation="uppercase"
-        )
+        """测试文本转大写（v3.0 架构）"""
+        # v3.0: 不传入文件参数
+        result = process_text_file(operation="uppercase")
 
         assert result["success"] is True
         assert result["operation"] == "uppercase"
-        assert result["input_file"] == "test.txt"
+        assert result["original_length"] == 11
+        assert result["processed_length"] == 11
+        
+        # v3.0: 返回值不包含文件路径
+        assert "input_file" not in result
+        assert "output_file" not in result
 
-        # 验证输出文件
-        output_path = workspace / result["output_file"]
-        assert output_path.exists()
-        assert output_path.read_text(encoding="utf-8") == "HELLO WORLD"
+        # 验证输出文件存在
+        output_files = list((workspace / "data/outputs").glob("*"))
+        assert len(output_files) == 1
+        assert output_files[0].read_text(encoding="utf-8") == "HELLO WORLD"
 
     def test_process_text_file_lowercase(self, workspace):
-        """测试文本转小写"""
-        result = process_text_file(
-            input_files=["test.txt"],
-            operation="lowercase"
-        )
+        """测试文本转小写（v3.0 架构）"""
+        result = process_text_file(operation="lowercase")
 
         assert result["success"] is True
         assert result["operation"] == "lowercase"
 
-        output_path = workspace / result["output_file"]
-        assert output_path.read_text(encoding="utf-8") == "hello world"
+        output_files = list((workspace / "data/outputs").glob("*"))
+        assert len(output_files) == 1
+        assert output_files[0].read_text(encoding="utf-8") == "hello world"
 
     def test_process_text_file_reverse(self, workspace):
-        """测试文本反转"""
-        result = process_text_file(
-            input_files=["test.txt"],
-            operation="reverse"
-        )
+        """测试文本反转（v3.0 架构）"""
+        result = process_text_file(operation="reverse")
 
         assert result["success"] is True
         assert result["operation"] == "reverse"
 
-        output_path = workspace / result["output_file"]
-        assert output_path.read_text(encoding="utf-8") == "dlroW olleH"
+        output_files = list((workspace / "data/outputs").glob("*"))
+        assert len(output_files) == 1
+        assert output_files[0].read_text(encoding="utf-8") == "dlroW olleH"
 
-    def test_process_text_file_missing(self, workspace):
-        """测试文件不存在"""
-        result = process_text_file(
-            input_files=["missing.txt"],
-            operation="uppercase"
-        )
+    def test_process_text_file_no_input(self, workspace):
+        """测试没有输入文件（v3.0 架构）"""
+        # 删除所有输入文件
+        for f in (workspace / "data/inputs").glob("*"):
+            f.unlink()
+        
+        result = process_text_file(operation="uppercase")
 
         assert result["success"] is False
-        assert result["error_code"] == "FILE_NOT_FOUND"
+        assert result["error_code"] == "NO_INPUT_FILE"
 
     def test_process_text_file_invalid_operation(self, workspace):
-        """测试无效操作"""
-        result = process_text_file(
-            input_files=["test.txt"],
-            operation="invalid"
-        )
+        """测试无效操作（v3.0 架构）"""
+        result = process_text_file(operation="invalid")
 
         assert result["success"] is False
         assert result["error_code"] == "INVALID_OPERATION"
