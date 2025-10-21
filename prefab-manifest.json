@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "name": "Hello World 示例预制件",
   "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数（v3.0 架构）",
+  "author": "Your Name",
+  "github_url": "https://github.com/your-org/your-prefab",
   "tags": [
     "example",
     "hello-world",
