@@ -18,6 +18,7 @@
 |------|------|---------|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | 架构设计文档，技术选型、设计理念和项目结构 | 架构师、高级开发者、新贡献者 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 贡献指南，代码规范和提交流程 | 贡献者 |
+| [STREAMING_GUIDE.md](STREAMING_GUIDE.md) | 流式函数开发指南，实现实时输出 | 开发者 |
 
 ### 特殊用途
 
@@ -88,6 +89,7 @@
 - **添加新功能** → [CONTRIBUTING.md](CONTRIBUTING.md) 开发工作流
 - **发布新版本** → [README.md](README.md#5-发布预制件) 或 [QUICK_REFERENCE.md](QUICK_REFERENCE.md#版本管理与发布)
 - **查看示例代码** → [src/main.py](src/main.py)
+- **实现流式函数** → [STREAMING_GUIDE.md](STREAMING_GUIDE.md)
 - **修复 CI/CD 问题** → [ARCHITECTURE.md](ARCHITECTURE.md#cicd-流程)
 - **配置 AI 助手** → [AGENTS.md](AGENTS.md)
 

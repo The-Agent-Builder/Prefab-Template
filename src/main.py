@@ -10,11 +10,17 @@
 - 所有文件参数都是列表形式（即使只有一个文件）
 
 📖 完整开发指南请查看：PREFAB_GUIDE.md
+
+🌊 流式函数说明：
+- 使用生成器函数（yield）实现流式返回
+- 在 manifest 中设置 "streaming": true
+- 适用于实时输出、进度报告、大数据处理等场景
 """
 
 import os
+import time
 from pathlib import Path
-from typing import List
+from typing import List, Iterator, Dict, Any
 
 
 # 固定路径常量
@@ -268,5 +274,99 @@ def fetch_weather(city: str) -> dict:
         return {
             "success": False,
             "error": str(e),
+            "error_code": "UNEXPECTED_ERROR"
+        }
+
+
+def count_stream(count: int = 10, interval: float = 0.5) -> Iterator[Dict[str, Any]]:
+    """
+    流式计数器（演示流式函数的实现）
+
+    这是一个流式函数示例，展示如何使用生成器实现实时输出。
+    适用于需要实时反馈的场景，如进度报告、实时数据处理等。
+
+    🌊 流式函数特点：
+    - 使用 Iterator[Dict] 作为返回类型
+    - 使用 yield 逐步返回结果
+    - 在 manifest 中设置 "streaming": true
+    - 客户端通过 SSE (Server-Sent Events) 接收实时数据
+
+    Args:
+        count: 计数总数，默认 10
+        interval: 每次计数的间隔秒数，默认 0.5
+
+    Yields:
+        dict: SSE 事件数据，包含以下字段：
+            - type: 事件类型 ("start" | "progress" | "done" | "error")
+            - data: 事件数据
+            - metadata: 可选的元数据
+
+    Examples:
+        >>> for event in count_stream(count=5, interval=0.1):
+        ...     print(event)
+        {"type": "start", "data": {"total": 5}}
+        {"type": "progress", "data": {"current": 1, "total": 5, "percentage": 20}}
+        {"type": "progress", "data": {"current": 2, "total": 5, "percentage": 40}}
+        ...
+        {"type": "done", "data": {"total": 5, "completed": True}}
+    """
+    try:
+        # 参数验证
+        if count <= 0:
+            yield {
+                "type": "error",
+                "data": "count 必须大于 0",
+                "error_code": "INVALID_COUNT"
+            }
+            return
+
+        if interval < 0:
+            yield {
+                "type": "error",
+                "data": "interval 不能为负数",
+                "error_code": "INVALID_INTERVAL"
+            }
+            return
+
+        # Step 1: 发送开始事件
+        yield {
+            "type": "start",
+            "data": {
+                "total": count,
+                "interval": interval
+            }
+        }
+
+        # Step 2: 逐步计数并发送进度事件
+        for i in range(1, count + 1):
+            time.sleep(interval)
+
+            percentage = int((i / count) * 100)
+
+            yield {
+                "type": "progress",
+                "data": {
+                    "current": i,
+                    "total": count,
+                    "percentage": percentage,
+                    "message": f"正在计数: {i}/{count}"
+                }
+            }
+
+        # Step 3: 发送完成事件
+        yield {
+            "type": "done",
+            "data": {
+                "total": count,
+                "completed": True,
+                "message": "计数完成"
+            }
+        }
+
+    except Exception as e:
+        # 发送错误事件
+        yield {
+            "type": "error",
+            "data": str(e),
             "error_code": "UNEXPECTED_ERROR"
         }

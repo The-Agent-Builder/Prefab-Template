@@ -76,6 +76,8 @@ dev = [
 ```
 
 ### 4. 函数设计规范
+
+#### 非流式函数（一次性返回）
 ```python
 def function_name(param1: str, param2: int = 0) -> dict:
     """
@@ -98,6 +100,41 @@ def function_name(param1: str, param2: int = 0) -> dict:
         return {
             "success": False,
             "error": str(e)
+        }
+```
+
+#### 流式函数（实时返回）
+```python
+from typing import Iterator, Dict, Any
+
+def stream_function(param: str) -> Iterator[Dict[str, Any]]:
+    """
+    一句话描述函数功能（流式）
+    
+    Args:
+        param: 参数说明
+    
+    Yields:
+        dict: SSE 事件数据
+            - type: "start" | "progress" | "done" | "error"
+            - data: 事件数据
+    """
+    try:
+        # 发送开始事件
+        yield {"type": "start", "data": {...}}
+        
+        # 处理并逐步返回
+        for item in process_items():
+            yield {"type": "progress", "data": item}
+        
+        # 发送完成事件
+        yield {"type": "done", "data": {...}}
+        
+    except Exception as e:
+        yield {
+            "type": "error",
+            "data": str(e),
+            "error_code": "ERROR_CODE"
         }
 ```
 
