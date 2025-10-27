@@ -20,8 +20,7 @@
 import os
 import time
 from pathlib import Path
-from typing import List, Iterator, Dict, Any
-
+from typing import Any, Dict, Iterator
 
 # 固定路径常量
 DATA_INPUTS = Path("data/inputs")

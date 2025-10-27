@@ -4,12 +4,14 @@
 测试所有暴露给 AI 的函数，确保它们按预期工作。
 """
 
-import pytest
-from pathlib import Path
-import tempfile
-import shutil
 import os
-from src.main import greet, echo, add_numbers, process_text_file, fetch_weather
+import shutil
+import tempfile
+from pathlib import Path
+
+import pytest
+
+from src.main import add_numbers, echo, fetch_weather, greet, process_text_file
 
 
 class TestBasicFunctions:

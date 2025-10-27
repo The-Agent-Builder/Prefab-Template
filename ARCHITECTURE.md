@@ -158,26 +158,26 @@ graph TD
     B --> C[安装 uv]
     C --> D[设置 Python 3.11]
     D --> E[同步依赖]
-    
+
     E --> F[验证阶段]
     F --> F1[Flake8 检查]
     F --> F2[Pytest 测试]
     F --> F3[Manifest 验证]
     F --> F4[版本号验证]
-    
+
     F1 --> G[构建阶段]
     F2 --> G
     F3 --> G
     F4 --> G
-    
+
     G --> G1[创建构建目录]
     G1 --> G2[复制核心文件]
     G2 --> G3[下载运行时依赖]
-    
+
     G3 --> H[打包阶段]
     H --> H1[构建 Wheel 包]
     H1 --> H2[验证 Wheel 包]
-    
+
     H2 --> I[发布阶段]
     I --> I1[创建 GitHub Release]
     I1 --> I2[上传 .whl 文件]
@@ -194,7 +194,7 @@ graph TD
 **三重验证保障：**
 
 1. **代码质量**: Flake8 静态检查
-2. **功能正确性**: Pytest 单元测试  
+2. **功能正确性**: Pytest 单元测试
 3. **接口一致性**: Manifest 验证脚本
 
 任何一项失败，整个流程中断。
@@ -279,11 +279,11 @@ class TestMyFunction:
     def test_normal_case(self):
         """测试正常情况"""
         assert my_function("input") == expected
-    
+
     def test_edge_case(self):
         """测试边界情况"""
         assert my_function("") == {"success": False}
-    
+
     def test_error_handling(self):
         """测试错误处理"""
         with pytest.raises(ValueError):
@@ -342,10 +342,10 @@ def my_function(input_data: str) -> dict:
                 "success": False,
                 "error": "输入不能为空"
             }
-        
+
         # 执行逻辑
         result = process(input_data)
-        
+
         return {
             "success": True,
             "result": result
@@ -363,13 +363,13 @@ def my_function(input_data: str) -> dict:
 def function_name(param1: str, param2: int = 0) -> dict:
     """
     一句话描述函数的作用
-    
+
     详细说明函数的功能、使用场景和注意事项。
-    
+
     Args:
         param1: 参数1的说明，包括类型、格式、范围等
         param2: 参数2的说明，可选参数要说明默认值
-    
+
     Returns:
         返回值的结构说明：
         {
@@ -377,10 +377,10 @@ def function_name(param1: str, param2: int = 0) -> dict:
             "result": any,    # 结果数据
             "error": str      # 错误信息（失败时）
         }
-    
+
     Raises:
         ValueError: 什么情况下会抛出此异常
-    
+
     Example:
         >>> result = function_name("test", 10)
         >>> print(result["success"])
@@ -430,4 +430,3 @@ def function_name(param1: str, param2: int = 0) -> dict:
 ---
 
 **维护者**: 请在对架构进行重大更改时更新此文档。
-

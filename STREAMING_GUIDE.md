@@ -24,25 +24,25 @@ from typing import Iterator, Dict, Any
 def my_stream_function(param: str) -> Iterator[Dict[str, Any]]:
     """
     流式函数示例
-    
+
     Args:
         param: 参数说明
-    
+
     Yields:
         dict: SSE 事件数据
     """
     try:
         # 开始事件
         yield {"type": "start", "data": {"param": param}}
-        
+
         # 处理并逐步返回
         for i in range(5):
             result = process_data(i)
             yield {"type": "progress", "data": result}
-        
+
         # 完成事件
         yield {"type": "done", "data": {"status": "completed"}}
-        
+
     except Exception as e:
         yield {"type": "error", "data": str(e)}
 ```
@@ -80,7 +80,7 @@ def my_stream_function(param: str) -> Iterator[Dict[str, Any]]:
 # tests/test_main.py
 def test_my_stream_function():
     result = list(my_stream_function("test"))
-    
+
     # 验证事件顺序
     assert result[0]["type"] == "start"
     assert any(r["type"] == "progress" for r in result)
@@ -176,7 +176,7 @@ def batch_process(items: list) -> Iterator[Dict[str, Any]]:
     """批量处理任务，实时报告进度"""
     try:
         total = len(items)
-        
+
         # 开始
         yield {
             "type": "start",
@@ -185,11 +185,11 @@ def batch_process(items: list) -> Iterator[Dict[str, Any]]:
                 "message": f"开始处理 {total} 个项目"
             }
         }
-        
+
         # 逐个处理
         for i, item in enumerate(items, 1):
             result = process_item(item)
-            
+
             yield {
                 "type": "progress",
                 "data": {
@@ -200,9 +200,9 @@ def batch_process(items: list) -> Iterator[Dict[str, Any]]:
                     "result": result
                 }
             }
-            
+
             time.sleep(0.1)  # 模拟处理时间
-        
+
         # 完成
         yield {
             "type": "done",
@@ -211,7 +211,7 @@ def batch_process(items: list) -> Iterator[Dict[str, Any]]:
                 "message": "所有项目处理完成"
             }
         }
-        
+
     except Exception as e:
         yield {
             "type": "error",
@@ -231,20 +231,20 @@ def chat_stream(messages: list, model: str = "gpt-4o-mini") -> Iterator[Dict[str
     """流式 LLM 聊天"""
     try:
         client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
-        
+
         # 开始
         yield {
             "type": "start",
             "data": {"model": model}
         }
-        
+
         # 流式调用
         stream = client.chat.completions.create(
             model=model,
             messages=messages,
             stream=True
         )
-        
+
         # 逐块返回
         for chunk in stream:
             if chunk.choices[0].delta.content:
@@ -252,13 +252,13 @@ def chat_stream(messages: list, model: str = "gpt-4o-mini") -> Iterator[Dict[str
                     "type": "content",
                     "data": chunk.choices[0].delta.content
                 }
-        
+
         # 完成
         yield {
             "type": "done",
             "data": {"finish_reason": "stop"}
         }
-        
+
     except Exception as e:
         yield {
             "type": "error",
@@ -278,19 +278,19 @@ def process_large_file(filepath: str) -> Iterator[Dict[str, Any]]:
     try:
         path = Path(filepath)
         total_lines = sum(1 for _ in path.open())
-        
+
         yield {
             "type": "start",
             "data": {"total_lines": total_lines}
         }
-        
+
         processed = 0
         with path.open() as f:
             for line in f:
                 # 处理行
                 result = process_line(line)
                 processed += 1
-                
+
                 # 每100行报告一次进度
                 if processed % 100 == 0:
                     yield {
@@ -301,12 +301,12 @@ def process_large_file(filepath: str) -> Iterator[Dict[str, Any]]:
                             "percentage": int((processed / total_lines) * 100)
                         }
                     }
-        
+
         yield {
             "type": "done",
             "data": {"processed": processed}
         }
-        
+
     except Exception as e:
         yield {
             "type": "error",
@@ -332,7 +332,7 @@ response = requests.post(
 for line in response.iter_lines():
     if line.startswith(b'data: '):
         event = json.loads(line[6:])
-        
+
         if event["type"] == "progress":
             print(f"进度: {event['data']['percentage']}%")
         elif event["type"] == "content":
@@ -356,14 +356,14 @@ const decoder = new TextDecoder();
 while (true) {
   const {done, value} = await reader.read();
   if (done) break;
-  
+
   const chunk = decoder.decode(value);
   const lines = chunk.split('\n');
-  
+
   for (const line of lines) {
     if (line.startsWith('data: ')) {
       const event = JSON.parse(line.slice(6));
-      
+
       switch (event.type) {
         case 'progress':
           console.log(`进度: ${event.data.percentage}%`);
@@ -389,14 +389,14 @@ def safe_stream(param: str) -> Iterator[Dict]:
     try:
         # 开始事件
         yield {"type": "start", "data": {...}}
-        
+
         # 业务逻辑
         for item in process():
             yield {"type": "progress", "data": item}
-        
+
         # 完成事件
         yield {"type": "done", "data": {...}}
-        
+
     except SpecificError as e:
         # 特定错误
         yield {
@@ -421,13 +421,13 @@ def stream_with_resources() -> Iterator[Dict]:
     try:
         connection = open_connection()
         yield {"type": "start", "data": {}}
-        
+
         # 使用资源
         for data in connection.read_stream():
             yield {"type": "progress", "data": data}
-        
+
         yield {"type": "done", "data": {}}
-        
+
     finally:
         # 确保资源被释放
         if connection:
@@ -441,10 +441,10 @@ def controlled_stream(items: list) -> Iterator[Dict]:
     """避免发送过多进度事件"""
     total = len(items)
     last_percentage = -1
-    
+
     for i, item in enumerate(items):
         result = process(item)
-        
+
         # 只在百分比变化时报告
         percentage = int((i / total) * 100)
         if percentage != last_percentage:
@@ -458,15 +458,15 @@ def controlled_stream(items: list) -> Iterator[Dict]:
 def test_stream_function():
     # 收集所有事件
     events = list(my_stream_function("test"))
-    
+
     # 验证事件顺序
     assert events[0]["type"] == "start"
     assert events[-1]["type"] == "done"
-    
+
     # 验证进度事件
     progress_events = [e for e in events if e["type"] == "progress"]
     assert len(progress_events) > 0
-    
+
     # 验证数据完整性
     for event in progress_events:
         assert "data" in event
@@ -494,10 +494,10 @@ def batch_yield(items: list, batch_size: int = 100) -> Iterator[Dict]:
 def buffered_stream() -> Iterator[Dict]:
     """定期刷新缓冲"""
     import sys
-    
+
     for i in range(100):
         yield {"type": "progress", "data": {"count": i}}
-        
+
         # 定期刷新输出缓冲
         if i % 10 == 0:
             sys.stdout.flush()
@@ -529,6 +529,5 @@ A: 使用 `list()` 收集所有事件，然后验证事件顺序和数据完整�
 
 ---
 
-**更新时间**: 2024-10-23  
+**更新时间**: 2024-10-23
 **适用版本**: v3.0+
-

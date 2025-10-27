@@ -5,8 +5,8 @@
 运行此脚本来验证你的开发环境是否正确设置
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -149,4 +149,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

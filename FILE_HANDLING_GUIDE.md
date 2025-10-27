@@ -74,13 +74,13 @@ def video_to_audio(input_files: List[str], format: str = "mp3"):
     # 获取输入文件
     video_filename = input_files[0]  # "1.mp4"
     video_path = DATA_INPUTS / video_filename
-    
+
     # 生成输出文件
     DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
     audio_path = DATA_OUTPUTS / f"audio.{format}"
-    
+
     # 处理...
-    
+
     # 返回相对路径
     return {
         "success": True,
@@ -121,11 +121,11 @@ DATA_OUTPUTS = Path("data/outputs")
 def video_to_audio(input_files: List[str], format: str = "mp3") -> dict:
     """
     将视频转换为音频
-    
+
     Args:
         input_files: 输入视频文件名列表（只取第一个）
         format: 输出格式
-    
+
     Returns:
         包含输出文件路径的字典
     """
@@ -133,30 +133,30 @@ def video_to_audio(input_files: List[str], format: str = "mp3") -> dict:
         # 1. 获取输入文件
         video_filename = input_files[0]
         video_path = DATA_INPUTS / video_filename
-        
+
         if not video_path.exists():
             return {
                 "success": False,
                 "error": f"文件不存在: {video_filename}"
             }
-        
+
         # 2. 确保输出目录存在
         DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
-        
+
         # 3. 处理文件
         audio_path = DATA_OUTPUTS / f"audio.{format}"
-        
+
         from moviepy.editor import VideoFileClip
         video = VideoFileClip(str(video_path))
         video.audio.write_audiofile(str(audio_path))
         video.close()
-        
+
         # 4. 返回相对路径（Gateway 会自动替换为 S3 URL）
         return {
             "success": True,
             "output_file": f"data/outputs/audio.{format}"
         }
-    
+
     except Exception as e:
         return {
             "success": False,
@@ -170,10 +170,10 @@ def video_to_audio(input_files: List[str], format: str = "mp3") -> dict:
 def concatenate_videos(input_files: List[str]) -> dict:
     """
     拼接多个视频
-    
+
     Args:
         input_files: 输入视频文件名列表（至少2个）
-    
+
     Returns:
         包含输出文件路径的字典
     """
@@ -183,10 +183,10 @@ def concatenate_videos(input_files: List[str]) -> dict:
                 "success": False,
                 "error": "至少需要2个视频文件"
             }
-        
+
         # 1. 加载所有输入文件
         from moviepy.editor import VideoFileClip, concatenate_videoclips
-        
+
         clips = []
         for filename in input_files:
             video_path = DATA_INPUTS / filename
@@ -196,26 +196,26 @@ def concatenate_videos(input_files: List[str]) -> dict:
                     "error": f"文件不存在: {filename}"
                 }
             clips.append(VideoFileClip(str(video_path)))
-        
+
         # 2. 拼接视频
         final = concatenate_videoclips(clips)
-        
+
         # 3. 输出
         DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
         output_path = DATA_OUTPUTS / "result.mp4"
         final.write_videofile(str(output_path))
-        
+
         # 清理
         for clip in clips:
             clip.close()
         final.close()
-        
+
         # 4. 返回相对路径
         return {
             "success": True,
             "output_file": "data/outputs/result.mp4"
         }
-    
+
     except Exception as e:
         return {
             "success": False,
@@ -229,40 +229,40 @@ def concatenate_videos(input_files: List[str]) -> dict:
 def extract_frames(input_files: List[str], times: List[float]) -> dict:
     """
     从视频提取帧
-    
+
     Args:
         input_files: 输入视频文件名列表（只取第一个）
         times: 时间点列表（秒）
-    
+
     Returns:
         包含多个输出文件路径的字典
     """
     try:
         video_filename = input_files[0]
         video_path = DATA_INPUTS / video_filename
-        
+
         from moviepy.editor import VideoFileClip
         video = VideoFileClip(str(video_path))
-        
+
         DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
-        
+
         frame_files = []
         for i, t in enumerate(times):
             # 保存帧
             frame_path = DATA_OUTPUTS / f"frame_{i:03d}.jpg"
             video.save_frame(str(frame_path), t=t)
-            
+
             # 记录相对路径
             frame_files.append(f"data/outputs/frame_{i:03d}.jpg")
-        
+
         video.close()
-        
+
         return {
             "success": True,
             "frame_count": len(frame_files),
             "frames": frame_files  # 路径列表
         }
-    
+
     except Exception as e:
         return {
             "success": False,
@@ -411,19 +411,19 @@ assert Path(result["output_file"]).exists()
 
 ## 📚 常见问题
 
-**Q: 为什么所有文件参数都是列表？**  
+**Q: 为什么所有文件参数都是列表？**
 A: 统一格式，简化代码模式。单文件场景取 `[0]`，多文件场景直接遍历。
 
-**Q: 输出文件名可以自定义吗？**  
+**Q: 输出文件名可以自定义吗？**
 A: 可以，只要在 `data/outputs/` 目录下即可。建议使用语义化的名称。
 
-**Q: 如何处理大文件？**  
+**Q: 如何处理大文件？**
 A: Gateway 已经配置了分片上传/下载，Prefab 无需特殊处理。
 
-**Q: 输出多个文件怎么办？**  
+**Q: 输出多个文件怎么办？**
 A: Gateway 会自动扫描 `data/outputs/` 并上传所有文件，只需返回路径列表。
 
-**Q: 可以在子目录中输出文件吗？**  
+**Q: 可以在子目录中输出文件吗？**
 A: 可以，如 `data/outputs/frames/frame_001.jpg`，Gateway 会递归上传。
 
 ---
@@ -433,4 +433,3 @@ A: 可以，如 `data/outputs/frames/frame_001.jpg`，Gateway 会递归上传。
 - [README.md](README.md) - 项目概览
 - [PREFAB_GUIDE.md](PREFAB_GUIDE.md) - 完整开发指南
 - [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - 快速参考
-

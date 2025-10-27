@@ -129,4 +129,3 @@ build-backend = "setuptools.build_meta"
 ---
 *(NFRs, Scope, Metrics 部分省略)*
 ---
-

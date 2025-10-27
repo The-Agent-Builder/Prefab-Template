@@ -134,14 +134,14 @@ DATA_OUTPUTS = Path("data/outputs")
 def video_to_audio(audio_format: str = "mp3") -> dict:
     """
     将视频转换为音频
-    
+
     文件约定：
     - 输入文件：自动在 data/inputs/ 下（Gateway 下载）
     - 输出文件：写入 data/outputs/（Gateway 自动上传）
-    
+
     Args:
         audio_format: 音频格式（不再包含文件参数！）
-    
+
     Returns:
         处理结果（不包含文件路径！）
     """
@@ -149,15 +149,15 @@ def video_to_audio(audio_format: str = "mp3") -> dict:
     input_files = list(DATA_INPUTS.glob("*"))
     if not input_files:
         return {"success": False, "error": "No input files"}
-    
+
     video_file = input_files[0]
-    
+
     # 处理...
     output_file = DATA_OUTPUTS / f"{video_file.stem}.{audio_format}"
-    
+
     # 保存到 data/outputs/
     # Gateway 会自动扫描并上传
-    
+
     return {
         "success": True,
         "format": audio_format,
@@ -235,13 +235,13 @@ return {
 def video_to_audio(audio_format: str = "mp3"):
     # 读取 data/inputs/
     video = list(Path("data/inputs").glob("*"))[0]
-    
+
     # 处理
     audio = convert(video, audio_format)
-    
+
     # 写入 data/outputs/
     audio.save(Path("data/outputs") / f"audio.{audio_format}")
-    
+
     # 返回结果（无文件路径）
     return {"success": True, "format": audio_format}
 ```
@@ -271,7 +271,7 @@ Prefab v3.0:
 def func(input_files: List[str], format: str):
     for file in input_files:
         video = load(DATA_INPUTS / file)
-        
+
 # v3.0: 只关注业务逻辑
 def func(format: str):
     for video in DATA_INPUTS.glob("*"):
@@ -373,14 +373,13 @@ def video_to_audio(audio_format: str = "mp3") -> dict:
 1. ✅ 架构设计（本文档）
 2. 📝 Template 更新
 3. 🔧 Gateway 适配
-4. 🏭 Factory 适配  
+4. 🏭 Factory 适配
 5. 🎬 Video-processing 迁移
 6. 🖼️ Frontend 适配
 7. 🧪 全面测试
 
 ---
 
-**版本**: v3.0  
-**状态**: 设计完成  
+**版本**: v3.0
+**状态**: 设计完成
 **下一步**: 实施
-

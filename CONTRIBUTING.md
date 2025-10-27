@@ -66,17 +66,17 @@ git checkout -b fix/your-bug-fix
 def calculate_total(items: list, tax_rate: float = 0.1) -> dict:
     """
     计算订单总金额
-    
+
     Args:
         items: 商品列表
         tax_rate: 税率（默认 10%）
-    
+
     Returns:
         包含总金额的字典
     """
     subtotal = sum(item['price'] for item in items)
     tax = subtotal * tax_rate
-    
+
     return {
         "success": True,
         "subtotal": subtotal,
@@ -305,4 +305,3 @@ git push origin feature/your-feature-name
 ---
 
 **Happy Coding! 🚀**
-

@@ -99,12 +99,12 @@ DATA_OUTPUTS = Path("data/outputs")
 def video_to_audio(audio_format: str = "mp3") -> dict:
     """
     将视频转换为音频（v3.0 架构）
-    
+
     ⚠️ 注意：不再有文件参数！
-    
+
     Args:
         audio_format: 音频格式（纯业务参数）
-    
+
     Returns:
         业务结果（不包含文件路径）
     """
@@ -112,18 +112,18 @@ def video_to_audio(audio_format: str = "mp3") -> dict:
     input_files = list(DATA_INPUTS.glob("*"))
     if not input_files:
         return {"success": False, "error": "No input files"}
-    
+
     video_file = input_files[0]
-    
+
     # 2. 处理文件
     audio_clip = extract_audio(video_file)
     duration = audio_clip.duration
-    
+
     # 3. 写入 data/outputs（Gateway 会自动上传）
     output_file = DATA_OUTPUTS / f"{video_file.stem}.{audio_format}"
     DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
     audio_clip.save(output_file)
-    
+
     # 4. 返回业务结果（不包含文件路径）
     return {
         "success": True,
@@ -138,7 +138,7 @@ def video_to_audio(audio_format: str = "mp3") -> dict:
 def add_watermark(position: str = "bottom-right") -> dict:
     """
     为视频添加水印
-    
+
     文件组织：
     - data/inputs/video/       ← files.video
     - data/inputs/watermark/   ← files.watermark
@@ -147,18 +147,18 @@ def add_watermark(position: str = "bottom-right") -> dict:
     # 读取不同文件组
     video_files = list(Path("data/inputs/video").glob("*"))
     watermark_files = list(Path("data/inputs/watermark").glob("*"))
-    
+
     video = video_files[0]
     watermark = watermark_files[0]
-    
+
     # 处理...
     result_video = add_watermark_to_video(video, watermark, position)
-    
+
     # 写入输出
     output_file = Path("data/outputs/watermarked.mp4")
     output_file.parent.mkdir(parents=True, exist_ok=True)
     result_video.save(output_file)
-    
+
     return {"success": True, "position": position}
 ```
 
@@ -209,13 +209,13 @@ return {
 def video_to_audio(audio_format: str):
     # 自动扫描输入
     video = list(Path("data/inputs").glob("*"))[0]
-    
+
     # 处理
     audio = convert(video, audio_format)
-    
+
     # 写入输出
     audio.save(Path("data/outputs/audio.mp3"))
-    
+
     # 返回业务结果
     return {"success": True}
 ```
@@ -394,13 +394,13 @@ def process_text(operation: str = "uppercase") -> dict:
     # 扫描输入
     files = list(Path("data/inputs").glob("*"))
     content = files[0].read_text()
-    
+
     # 处理
     result = content.upper() if operation == "uppercase" else content.lower()
-    
+
     # 写入输出
     Path("data/outputs/result.txt").write_text(result)
-    
+
     # 返回业务数据
     return {"operation": operation, "length": len(result)}
 ```
@@ -411,13 +411,13 @@ def process_text(operation: str = "uppercase") -> dict:
 def concat_videos() -> dict:
     # 扫描所有输入视频
     videos = list(Path("data/inputs").glob("*.mp4"))
-    
+
     # 合并
     result = concatenate(videos)
-    
+
     # 输出
     result.save(Path("data/outputs/merged.mp4"))
-    
+
     return {"count": len(videos), "duration": result.duration}
 ```
 
@@ -428,13 +428,13 @@ def add_watermark(position: str = "bottom-right") -> dict:
     # 不同的文件组
     video = list(Path("data/inputs/video").glob("*"))[0]
     watermark = list(Path("data/inputs/watermark").glob("*"))[0]
-    
+
     # 处理
     result = overlay(video, watermark, position)
-    
+
     # 输出
     result.save(Path("data/outputs/watermarked.mp4"))
-    
+
     return {"position": position}
 ```
 
@@ -444,14 +444,14 @@ def add_watermark(position: str = "bottom-right") -> dict:
 def test_process_text_file():
     # v3.0: 不传入文件参数
     result = process_text_file(operation="uppercase")
-    
+
     # 验证业务结果
     assert result["success"] is True
     assert result["operation"] == "uppercase"
-    
+
     # v3.0: 返回值不包含文件路径
     assert "output_file" not in result
-    
+
     # 验证输出文件存在
     output_files = list(Path("data/outputs").glob("*"))
     assert len(output_files) >= 1
@@ -465,7 +465,6 @@ def test_process_text_file():
 
 ---
 
-**版本**: v3.0  
-**更新日期**: 2025-10-21  
+**版本**: v3.0
+**更新日期**: 2025-10-21
 **状态**: ✅ 已实现
-

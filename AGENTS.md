@@ -17,7 +17,8 @@
 - **语言**: Python 3.11+
 - **包管理**: uv (现代化的 Python 包管理器)
 - **测试**: pytest
-- **代码检查**: flake8
+- **代码检查**: flake8, isort
+- **Git Hooks**: pre-commit (自动代码质量检查)
 - **构建**: setuptools (v3.0 更新)
 - **CI/CD**: GitHub Actions
 - **配置**: pyproject.toml (PEP 621) + prefab-manifest.json (v3.0 架构)
@@ -82,11 +83,11 @@ dev = [
 def function_name(param1: str, param2: int = 0) -> dict:
     """
     一句话描述函数功能
-    
+
     Args:
         param1: 参数1说明
         param2: 参数2说明（可选）
-    
+
     Returns:
         返回值说明
     """
@@ -110,10 +111,10 @@ from typing import Iterator, Dict, Any
 def stream_function(param: str) -> Iterator[Dict[str, Any]]:
     """
     一句话描述函数功能（流式）
-    
+
     Args:
         param: 参数说明
-    
+
     Yields:
         dict: SSE 事件数据
             - type: "start" | "progress" | "done" | "error"
@@ -122,14 +123,14 @@ def stream_function(param: str) -> Iterator[Dict[str, Any]]:
     try:
         # 发送开始事件
         yield {"type": "start", "data": {...}}
-        
+
         # 处理并逐步返回
         for item in process_items():
             yield {"type": "progress", "data": item}
-        
+
         # 发送完成事件
         yield {"type": "done", "data": {...}}
-        
+
     except Exception as e:
         yield {
             "type": "error",
@@ -166,14 +167,14 @@ import os
 def fetch_weather(city: str) -> dict:
     # 从环境变量获取（平台自动注入）
     api_key = os.environ.get('WEATHER_API_KEY')
-    
+
     if not api_key:
         return {
             "success": False,
             "error": "未配置 WEATHER_API_KEY",
             "error_code": "MISSING_API_KEY"
         }
-    
+
     # 使用 API Key...
 ```
 
@@ -194,8 +195,47 @@ def fetch_weather(city: str) -> dict:
 # 2. 同步依赖
 uv sync --dev
 
-# 3. 运行验证
+# 3. 安装 git hooks（推荐）
+uv run pre-commit install
+
+# 4. 运行验证
 uv run python scripts/quick_start.py
+```
+
+### Pre-commit Hooks（代码质量保障）
+
+**强烈推荐安装！** Pre-commit hooks 会在每次 `git commit` 前自动运行检查，避免提交有问题的代码。
+
+安装后，每次提交时会自动检查：
+- ✅ Flake8 代码风格（避免 F401 等错误）
+- ✅ isort 导入排序
+- ✅ Manifest 验证（与 main.py 一致性）
+- ✅ 单元测试（确保所有测试通过）
+- ✅ 版本同步（manifest 与 pyproject.toml 版本一致）
+
+```bash
+# 安装 hooks
+uv run pre-commit install
+
+# 手动运行所有检查
+uv run pre-commit run --all-files
+
+# 查看详细文档
+cat PRE_COMMIT_GUIDE.md
+```
+
+**示例：提交时自动检查**
+```bash
+$ git commit -m "feat: add new function"
+
+# 自动运行检查...
+flake8...................................................Passed
+isort....................................................Passed
+Validate prefab-manifest.json............................Passed
+Run pytest...............................................Passed
+Check version sync.......................................Passed
+
+# ✅ 所有检查通过，提交成功！
 ```
 
 ### 日常开发
@@ -250,13 +290,13 @@ uv add --dev package-name
 
 ### 常见问题
 
-**Q: 可以修改项目结构吗？**  
+**Q: 可以修改项目结构吗？**
 A: `src/main.py` 和 `prefab-manifest.json` 的位置和作用不可更改，但可以在 `src/` 下添加更多模块。
 
-**Q: 如何处理敏感信息？**  
+**Q: 如何处理敏感信息？**
 A: **推荐使用 v3.0 的 secrets 功能**。在 `prefab-manifest.json` 中声明 `secrets` 字段，平台会自动引导用户配置并注入到环境变量。参见本文档的 "Secrets 管理规范" 章节和 `fetch_weather` 示例。
 
-**Q: CI/CD 失败怎么办？**  
+**Q: CI/CD 失败怎么办？**
 A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。本地运行验证脚本排查。
 
 ## 验证清单
@@ -299,4 +339,3 @@ A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。
 ---
 
 **提示**: 如果你是 AI 助手，在修改代码时请始终参考本文档的约定和规范。
-

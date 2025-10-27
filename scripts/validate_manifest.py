@@ -10,10 +10,10 @@
 5. secrets 字段符合 v3.0 规范
 """
 
-import json
-import sys
 import ast
+import json
 import re
+import sys
 from pathlib import Path
 
 # v2.2 类型系统定义
@@ -37,7 +37,7 @@ SECRET_NAME_PATTERN = re.compile(r'^[A-Z0-9_]+$')
 def validate_files_definition(func_name, files_def):
     """
     验证 v3.0 的 files 字段定义
-    
+
     files 格式：
     {
       "input": {...},
@@ -46,41 +46,41 @@ def validate_files_definition(func_name, files_def):
     }
     """
     errors = []
-    
+
     if not isinstance(files_def, dict):
         errors.append(f"函数 '{func_name}': files 字段必须是对象")
         return errors
-    
+
     # 验证每个文件组
     for file_key, file_spec in files_def.items():
         # 检查必需字段
         if 'type' not in file_spec:
             errors.append(f"函数 '{func_name}': files.{file_key} 缺少 'type' 字段")
             continue
-        
+
         # files 必须是 array 类型
         if file_spec['type'] != 'array':
             errors.append(f"函数 '{func_name}': files.{file_key}.type 必须是 'array'")
             continue
-        
+
         # 检查 items 定义
         if 'items' not in file_spec:
             errors.append(f"函数 '{func_name}': files.{file_key} 缺少 'items' 字段")
             continue
-        
+
         items = file_spec['items']
         if 'type' not in items:
             errors.append(f"函数 '{func_name}': files.{file_key}.items 缺少 'type' 字段")
         elif items['type'] not in ('InputFile', 'OutputFile'):
             errors.append(f"函数 '{func_name}': files.{file_key}.items.type 必须是 'InputFile' 或 'OutputFile'，当前是 '{items['type']}'")
-        
+
         # 检查 InputFile 的必需字段
         if items.get('type') == 'InputFile':
             if 'minItems' not in file_spec:
                 errors.append(f"函数 '{func_name}': files.{file_key} 应定义 'minItems'")
             if 'maxItems' not in file_spec:
                 errors.append(f"函数 '{func_name}': files.{file_key} 应定义 'maxItems'")
-    
+
     return errors
 
 

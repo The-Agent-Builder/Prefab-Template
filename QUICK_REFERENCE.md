@@ -75,18 +75,18 @@ git tag v1.0.0 && git push origin v1.0.0     # 推送发布
 def your_function(param1: str, param2: int = 0) -> dict:
     """
     一句话描述函数功能
-    
+
     Args:
         param1: 参数1说明
         param2: 参数2说明（可选，默认0）
-    
+
     Returns:
         返回值说明
     """
     try:
         # 业务逻辑
         result = do_something(param1, param2)
-        
+
         return {
             "success": True,
             "result": result
@@ -230,20 +230,20 @@ uv run python scripts/version_bump.py patch
 def fetch_data(url: str, api_key: str = None) -> dict:
     """
     从API获取数据
-    
+
     Args:
         url: API地址
         api_key: API密钥（可选，可从环境变量获取）
     """
     import os
     import requests
-    
+
     key = api_key or os.getenv('API_KEY')
     if not key:
         return {"success": False, "error": "API key required"}
-    
+
     response = requests.get(url, headers={'Authorization': f'Bearer {key}'})
-    
+
     if response.status_code == 200:
         return {"success": True, "data": response.json()}
     else:
@@ -256,13 +256,13 @@ def fetch_data(url: str, api_key: str = None) -> dict:
 def process_batch(items: list, batch_size: int = 10) -> dict:
     """批量处理数据"""
     results = []
-    
+
     for i in range(0, len(items), batch_size):
         batch = items[i:i + batch_size]
         # 处理批次
         batch_result = process(batch)
         results.extend(batch_result)
-    
+
     return {
         "success": True,
         "processed": len(results),
@@ -273,4 +273,3 @@ def process_batch(items: list, batch_size: int = 10) -> dict:
 ---
 
 **保存此文件为书签，随时查阅！📌**
-

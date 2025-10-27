@@ -82,11 +82,11 @@
    [build-system]
    requires = ["setuptools>=61.0"]
    build-backend = "setuptools.build_meta"
-   
+
    [tool.setuptools.packages.find]
    where = ["."]
    include = ["src*"]
-   
+
    [tool.setuptools.package-data]
    "*" = ["*.json"]
    ```
@@ -212,4 +212,3 @@ def fetch_weather(city: str) -> dict:
 - 提交 [Issue](https://github.com/your-org/prefab-template/issues)
 - 发起 [Pull Request](https://github.com/your-org/prefab-template/pulls)
 - 参与 [讨论](https://github.com/your-org/prefab-template/discussions)
-

@@ -39,10 +39,10 @@ uv sync --dev
 def greet(name: str = "World") -> dict:
     """
     向用户问候
-    
+
     Args:
         name: 要问候的名字
-    
+
     Returns:
         包含问候语的字典
     """
@@ -160,10 +160,10 @@ def process_text(text, max_length=100):
 def my_function(param: str) -> dict:
     """
     一句话描述函数功能
-    
+
     Args:
         param: 参数说明
-    
+
     Returns:
         返回值说明
     """
@@ -207,7 +207,7 @@ def safe_divide(a: float, b: float) -> dict:
                 "error": "除数不能为零",
                 "error_code": "DIVISION_BY_ZERO"
             }
-        
+
         result = a / b
         return {
             "success": True,
@@ -233,14 +233,14 @@ def process_list(items: list, min_count: int = 1) -> dict:
             "error": "items 必须是列表类型",
             "error_code": "INVALID_TYPE"
         }
-    
+
     if len(items) < min_count:
         return {
             "success": False,
             "error": f"列表至少需要 {min_count} 个元素",
             "error_code": "INSUFFICIENT_ITEMS"
         }
-    
+
     # 处理逻辑
     result = [item.upper() for item in items]
     return {
@@ -255,16 +255,16 @@ def process_list(items: list, min_count: int = 1) -> dict:
 ```python
 def read_file_content(file_path: str) -> dict:
     """读取文件内容
-    
+
     Args:
         file_path: 文件路径（支持 InputFile 类型）
-    
+
     Returns:
         包含文件内容的字典
     """
     try:
         from pathlib import Path
-        
+
         path = Path(file_path)
         if not path.exists():
             return {
@@ -272,7 +272,7 @@ def read_file_content(file_path: str) -> dict:
                 "error": f"文件不存在: {file_path}",
                 "error_code": "FILE_NOT_FOUND"
             }
-        
+
         content = path.read_text(encoding='utf-8')
         return {
             "success": True,
@@ -727,10 +727,10 @@ uv run python scripts/validate_manifest.py
 def to_uppercase(text: str) -> dict:
     """
     将文本转换为大写
-    
+
     Args:
         text: 要转换的文本
-    
+
     Returns:
         包含转换结果的字典
     """
@@ -741,7 +741,7 @@ def to_uppercase(text: str) -> dict:
                 "error": "文本不能为空",
                 "error_code": "EMPTY_TEXT"
             }
-        
+
         result = text.upper()
         return {
             "success": True,
@@ -760,10 +760,10 @@ def to_uppercase(text: str) -> dict:
 def count_words(text: str) -> dict:
     """
     统计文本中的单词数量
-    
+
     Args:
         text: 要统计的文本
-    
+
     Returns:
         包含统计结果的字典
     """
@@ -774,7 +774,7 @@ def count_words(text: str) -> dict:
                 "error": "文本不能为空",
                 "error_code": "EMPTY_TEXT"
             }
-        
+
         words = text.split()
         return {
             "success": True,
@@ -877,4 +877,3 @@ def count_words(text: str) -> dict:
 4. 提交新的 Issue
 
 祝开发顺利！🎉
-

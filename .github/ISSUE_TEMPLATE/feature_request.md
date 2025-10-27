@@ -34,4 +34,3 @@ result = new_feature(param1, param2)
 ## 额外信息
 
 <!-- 其他相关的上下文、截图或参考资料 -->
-

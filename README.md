@@ -58,13 +58,33 @@ cd my-prefab
 uv sync --dev
 ```
 
-### 3. 编写你的预制件
+### 3. 安装 Git Hooks（强烈推荐）
+
+安装 pre-commit hooks 后，每次提交代码前会自动运行质量检查，避免提交有问题的代码：
+
+```bash
+# 安装 pre-commit hooks
+uv run pre-commit install
+
+# 🎉 现在每次 git commit 都会自动检查代码质量！
+```
+
+**自动检查项目：**
+- ✅ Flake8 代码风格（防止 F401 等常见错误）
+- ✅ isort 导入排序
+- ✅ Manifest 验证
+- ✅ 单元测试
+- ✅ 版本同步检查
+
+📖 详细使用指南：[PRE_COMMIT_GUIDE.md](PRE_COMMIT_GUIDE.md)
+
+### 4. 编写你的预制件
 
 1. **编辑 `src/main.py`**: 在这里编写你的核心业务逻辑
 2. **更新 `prefab-manifest.json`**: 描述你的函数签名和元数据
 3. **编写测试**: 在 `tests/test_main.py` 中添加单元测试
 
-### 4. 本地测试
+### 5. 本地测试
 
 ```bash
 # 运行测试
@@ -80,7 +100,7 @@ uv run python scripts/validate_manifest.py
 uv run python scripts/quick_start.py
 ```
 
-### 5. 发布预制件
+### 6. 发布预制件
 
 ```bash
 # 方式一: 使用版本升级脚本（推荐）
@@ -136,11 +156,11 @@ prefab-template/
 def analyze_dataset(data: list, operation: str = "statistics") -> dict:
     """
     分析数据集并返回统计结果
-    
+
     Args:
         data: 数字列表
         operation: 操作类型 ("statistics", "sum", "average")
-    
+
     Returns:
         包含分析结果的字典
     """
@@ -151,7 +171,7 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
                 "error": "数据集不能为空",
                 "error_code": "EMPTY_DATA"
             }
-        
+
         if operation == "statistics":
             stats = calculate_statistics(data)
             return {
@@ -297,14 +317,14 @@ def fetch_weather(city: str) -> dict:
     """获取城市天气信息"""
     # 从环境变量中读取密钥（平台会自动注入）
     api_key = os.environ.get('WEATHER_API_KEY')
-    
+
     if not api_key:
         return {
             "success": False,
             "error": "未配置 WEATHER_API_KEY",
             "error_code": "MISSING_API_KEY"
         }
-    
+
     # 使用 API Key 调用第三方服务
     # response = requests.get(api_url, headers={"Authorization": f"Bearer {api_key}"})
     ...
@@ -372,11 +392,11 @@ class TestVideoToAudio:
     def test_video_path(self):
         """提供真实的测试视频文件"""
         return os.path.join(os.path.dirname(__file__), "test.mp4")
-    
+
     def test_video_to_audio_default(self, test_video_path):
         """使用真实视频测试转换功能"""
         result = video_to_audio(test_video_path)
-        
+
         assert result["success"] is True
         assert os.path.exists(result["data"]["output_file"])
 ```
@@ -438,7 +458,7 @@ graph LR
 ### 发布产物
 
 - **格式**: Python Wheel (`.whl`)（例如 `hello_world_prefab-0.1.0-py3-none-any.whl`）
-- **内容**: 
+- **内容**:
   - `src/` 目录（包含所有源代码）
   - `prefab-manifest.json`（元数据文件）
   - 所有运行时依赖（自动包含）
@@ -479,8 +499,8 @@ result = analyze_dataset([2, 4, 6], "average")
 
 **用户体验示例：**
 
-> 用户: "帮我分析这组数据的统计信息：[10, 20, 30, 40, 50]"  
-> AI: *调用 `analyze_dataset([10, 20, 30, 40, 50], "statistics")`*  
+> 用户: "帮我分析这组数据的统计信息：[10, 20, 30, 40, 50]"
+> AI: *调用 `analyze_dataset([10, 20, 30, 40, 50], "statistics")`*
 > AI: "已完成分析：共 5 个数据点，平均值 30.0，最大值 50，最小值 10"
 
 ## 常见问题
@@ -541,7 +561,7 @@ def my_function():
 
 ### Q: 为什么要将测试数据提交到仓库？
 
-**A**: 
+**A**:
 1. **可重现性** - 任何人都能运行测试并得到相同结果
 2. **可审核性** - 社区可以验证预制件确实能处理真实数据
 3. **CI/CD 自动化** - GitHub Actions 可以自动运行完整测试
@@ -553,7 +573,7 @@ def my_function():
 
 ### Q: 如何调试 CI/CD 失败？
 
-**A**: 
+**A**:
 1. 查看 GitHub Actions 的日志输出
 2. 本地运行相同的命令进行复现：
    - `uv run --with pytest pytest tests/ -v` - 测试失败？
@@ -599,4 +619,3 @@ def my_function():
 **祝你开发愉快！🎉**
 
 _如果这个模板对你有帮助，请给我们一个 ⭐ Star！_
-
