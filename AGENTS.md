@@ -63,7 +63,40 @@ prefab-template/
 - 版本号必须与 `pyproject.toml` 保持一致
 - 运行 `uv run python scripts/validate_manifest.py` 验证一致性
 
-### 3. 依赖管理
+### 3. v3.0 文件路径约定（重要！）
+
+**路径规则**：
+- 输入文件路径 = `data/inputs/{files.key}/`
+- 输出文件路径 = `data/outputs/`
+
+**实例**：
+```python
+# 如果 manifest.json 中定义：
+{
+  "files": {
+    "input": { "type": "InputFile", ... }  // key 是 "input"
+  }
+}
+
+# 则代码中应该使用：
+DATA_INPUTS = Path("data/inputs/input")  # 注意是 /input/，不是 /inputs/
+DATA_OUTPUTS = Path("data/outputs")
+
+# 扫描输入文件：
+input_files = list(DATA_INPUTS.glob("*"))
+```
+
+**常见错误**：
+```python
+# ❌ 错误：缺少 key
+DATA_INPUTS = Path("data/inputs")  # 这会导致找不到文件！
+
+# ✅ 正确：包含 manifest 中的 key
+DATA_INPUTS = Path("data/inputs/input")  # 如果 files.input
+DATA_INPUTS = Path("data/inputs/video")  # 如果 files.video
+```
+
+### 4. 依赖管理
 ```toml
 [project]
 dependencies = [
@@ -76,7 +109,7 @@ dev = [
 ]
 ```
 
-### 4. 函数设计规范
+### 5. 函数设计规范
 
 #### 非流式函数（一次性返回）
 ```python
@@ -139,7 +172,7 @@ def stream_function(param: str) -> Iterator[Dict[str, Any]]:
         }
 ```
 
-### 5. Secrets 管理规范（v3.0 新特性）
+### 6. Secrets 管理规范（v3.0 新特性）
 
 如果函数需要使用 API Key、数据库连接等敏感信息：
 

@@ -72,8 +72,8 @@ class TestFileHandling:
         temp_dir = tempfile.mkdtemp()
         workspace_path = Path(temp_dir)
 
-        # 创建目录结构
-        inputs_dir = workspace_path / "data" / "inputs"
+        # 创建目录结构（v3.0: 文件按 manifest key 组织）
+        inputs_dir = workspace_path / "data" / "inputs" / "input"
         inputs_dir.mkdir(parents=True)
 
         # 创建测试输入文件
@@ -99,7 +99,7 @@ class TestFileHandling:
         assert result["operation"] == "uppercase"
         assert result["original_length"] == 11
         assert result["processed_length"] == 11
-        
+
         # v3.0: 返回值不包含文件路径
         assert "input_file" not in result
         assert "output_file" not in result
@@ -134,9 +134,9 @@ class TestFileHandling:
     def test_process_text_file_no_input(self, workspace):
         """测试没有输入文件（v3.0 架构）"""
         # 删除所有输入文件
-        for f in (workspace / "data/inputs").glob("*"):
+        for f in (workspace / "data" / "inputs" / "input").glob("*"):
             f.unlink()
-        
+
         result = process_text_file(operation="uppercase")
 
         assert result["success"] is False

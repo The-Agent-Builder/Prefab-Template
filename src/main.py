@@ -4,10 +4,16 @@
 这是一个示例预制件，展示了如何创建可被 AI 调用的函数。
 所有暴露给 AI 的函数都必须在此文件中定义。
 
-📁 文件路径约定：
-- 输入文件：data/inputs/<文件名>
-- 输出文件：data/outputs/<文件名>
-- 所有文件参数都是列表形式（即使只有一个文件）
+📁 v3.0 文件路径约定（重要！）：
+- 输入文件路径：data/inputs/{files.key}/
+  例如：manifest 中 files.input → data/inputs/input/
+  例如：manifest 中 files.video → data/inputs/video/
+- 输出文件：data/outputs/
+- Gateway 自动下载文件到 inputs，自动上传 outputs 中的文件
+
+⚠️ 常见错误：
+- ❌ 错误：DATA_INPUTS = Path("data/inputs")
+- ✅ 正确：DATA_INPUTS = Path("data/inputs/input")  # 如果 manifest 中 key 是 "input"
 
 📖 完整开发指南请查看：PREFAB_GUIDE.md
 
@@ -23,7 +29,10 @@ from pathlib import Path
 from typing import Any, Dict, Iterator
 
 # 固定路径常量
-DATA_INPUTS = Path("data/inputs")
+# v3.0: 文件组按 manifest 中的 key 组织（这里是 "input"）
+# 如果你的 manifest 中使用不同的 key，请相应修改路径
+# 例如：files.video → Path("data/inputs/video")
+DATA_INPUTS = Path("data/inputs/input")
 DATA_OUTPUTS = Path("data/outputs")
 
 
