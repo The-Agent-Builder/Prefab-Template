@@ -19,7 +19,7 @@
 - [示例预制件](#示例预制件)
 - [常见问题](#常见问题)
 
-**📚 更多文档**: [文档索引](DOCS_INDEX.md) | [架构设计](ARCHITECTURE.md) | [AI助手指南](AGENTS.md)
+**📚 更多文档**: [AI助手开发指南](AGENTS.md) | [贡献指南](CONTRIBUTING.md)
 
 ## 什么是预制件？
 
@@ -75,8 +75,6 @@ uv run pre-commit install
 - ✅ Manifest 验证
 - ✅ 单元测试
 - ✅ 版本同步检查
-
-📖 详细使用指南：[PRE_COMMIT_GUIDE.md](PRE_COMMIT_GUIDE.md)
 
 ### 4. 编写你的预制件
 

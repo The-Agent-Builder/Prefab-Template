@@ -252,9 +252,6 @@ uv run pre-commit install
 
 # 手动运行所有检查
 uv run pre-commit run --all-files
-
-# 查看详细文档
-cat PRE_COMMIT_GUIDE.md
 ```
 
 **示例：提交时自动检查**
@@ -365,9 +362,8 @@ A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。
 ## 参考资源
 
 - [项目文档](README.md) - 完整的使用指南
-- [快速参考](QUICK_REFERENCE.md) - 常用命令速查
 - [贡献指南](CONTRIBUTING.md) - 如何贡献代码
-- [产品需求文档](prd.md) - 项目背景和设计理念
+- [变更日志](CHANGELOG.md) - 版本更新记录
 
 ---
 
