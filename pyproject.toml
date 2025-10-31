@@ -1,6 +1,6 @@
 [project]
 name = "hello-world-prefab"
-version = "0.1.1"
+version = "0.1.2"
 description = "一个简单的 Hello World 示例预制件，展示如何创建可被 AI 调用的函数"
 readme = "README.md"
 requires-python = ">=3.11"
