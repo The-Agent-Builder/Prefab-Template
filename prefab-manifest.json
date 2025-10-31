@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "hello-world-prefab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "Hello World 示例预制件",
   "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数（v3.0 架构）",
   "author": "Your Name",
@@ -53,7 +53,10 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["INVALID_NAME", "UNEXPECTED_ERROR"]
+            "enum": [
+              "INVALID_NAME",
+              "UNEXPECTED_ERROR"
+            ]
           }
         }
       }
@@ -101,7 +104,10 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["EMPTY_TEXT", "UNEXPECTED_ERROR"]
+            "enum": [
+              "EMPTY_TEXT",
+              "UNEXPECTED_ERROR"
+            ]
           }
         }
       }
@@ -155,7 +161,10 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["CALCULATION_ERROR", "UNEXPECTED_ERROR"]
+            "enum": [
+              "CALCULATION_ERROR",
+              "UNEXPECTED_ERROR"
+            ]
           }
         }
       }
@@ -189,7 +198,11 @@
           "description": "操作类型（uppercase, lowercase, reverse）",
           "required": false,
           "default": "uppercase",
-          "enum": ["uppercase", "lowercase", "reverse"]
+          "enum": [
+            "uppercase",
+            "lowercase",
+            "reverse"
+          ]
         }
       ],
       "returns": {
@@ -224,7 +237,12 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["NO_INPUT_FILE", "FILE_NOT_FOUND", "INVALID_OPERATION", "PROCESSING_ERROR"]
+            "enum": [
+              "NO_INPUT_FILE",
+              "FILE_NOT_FOUND",
+              "INVALID_OPERATION",
+              "PROCESSING_ERROR"
+            ]
           }
         }
       }
@@ -277,7 +295,11 @@
             "type": "string",
             "description": "错误代码（失败时）",
             "optional": true,
-            "enum": ["MISSING_API_KEY", "INVALID_CITY", "UNEXPECTED_ERROR"]
+            "enum": [
+              "MISSING_API_KEY",
+              "INVALID_CITY",
+              "UNEXPECTED_ERROR"
+            ]
           }
         }
       },

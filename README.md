@@ -32,7 +32,7 @@
 - 🚀 **自动化 CI/CD**: 一键测试、打包、发布
 - 📦 **依赖管理**: 自动打包运行时依赖
 - 🔒 **质量保证**: 强制性的代码检查和测试
-- 🔐 **密钥管理**: 完善的 secrets 支持（v3.0 新特性）
+- 🔐 **密钥管理**: 完善的 secrets 支持
 
 ## 快速开始
 
@@ -129,6 +129,9 @@ prefab-template/
 ├── .github/
 │   └── workflows/
 │       └── build-and-release.yml    # CI/CD 自动化流程
+├── data/                            # 数据文件目录
+│   ├── inputs/                      # 输入文件目录（开发/测试时使用）
+│   └── outputs/                     # 输出文件目录（开发/测试时使用）
 ├── src/
 │   └── main.py                      # 预制件核心代码（必须）
 ├── tests/
@@ -266,7 +269,7 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
 }
 ```
 
-**支持的类型（v2.2 类型系统）：**
+**支持的类型：**
 
 *基础类型（对应 JSON Schema）：*
 - `string` - 字符串
@@ -277,10 +280,165 @@ def analyze_dataset(data: list, operation: str = "statistics") -> dict:
 - `array` - 数组/列表
 
 *平台感知类型（用于文件处理）：*
-- `InputFile` - 输入文件（平台会自动下载并传递本地路径）
-- `OutputFile` - 输出文件（平台会自动上传返回的文件路径）
+- `InputFile` - 输入文件
+- `OutputFile` - 输出文件
 
-### 密钥管理（Secrets）- v3.0 新特性
+### 文件处理指南
+
+当你的预制件需要处理文件（如图片、视频、文档等）时，需要使用**固定的文件路径约定**。平台会自动将用户上传的文件放置到指定目录，并在函数执行完成后收集输出文件。
+
+#### 路径约定（重要！）
+
+**输入文件路径规则：**
+```
+data/inputs/{files中的key名称}/
+```
+
+**输出文件路径规则：**
+```
+data/outputs/
+```
+
+#### Manifest 配置示例
+
+如果你的函数需要接收文件输入，在 `prefab-manifest.json` 中这样声明：
+
+```json
+{
+  "functions": [{
+    "name": "process_video",
+    "description": "处理视频文件",
+    "parameters": [],
+    "files": {
+      "input": {
+        "type": "InputFile",
+        "description": "需要处理的视频文件",
+        "required": true,
+        "accept": ".mp4,.avi,.mov"
+      }
+    },
+    "returns": {
+      "type": "object",
+      "description": "处理结果"
+    }
+  }]
+}
+```
+
+**关键点：**
+- `files` 字段中的 key（如 `"input"`）决定了输入文件的路径
+- `type: "InputFile"` 表示这是输入文件
+- `accept` 可选，用于限制文件类型
+
+#### 代码实现示例
+
+```python
+from pathlib import Path
+
+def process_video() -> dict:
+    """处理视频文件"""
+    # 固定路径：data/inputs/{key}/
+    # 这里的 "input" 对应 manifest 中 files.input 的 key
+    DATA_INPUTS = Path("data/inputs/input")
+    DATA_OUTPUTS = Path("data/outputs")
+
+    # 确保输出目录存在
+    DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # 扫描输入文件（平台会自动将文件放到这里）
+        input_files = list(DATA_INPUTS.glob("*"))
+
+        if not input_files:
+            return {
+                "success": False,
+                "error": "未找到输入文件",
+                "error_code": "NO_INPUT_FILES"
+            }
+
+        # 处理第一个文件
+        input_file = input_files[0]
+        print(f"处理文件: {input_file}")
+
+        # 执行你的业务逻辑...
+        # result = do_something(input_file)
+
+        # 将输出文件保存到固定路径（平台会自动收集）
+        output_file = DATA_OUTPUTS / "output.mp4"
+        # save_result(output_file)
+
+        return {
+            "success": True,
+            "data": {
+                "processed_file": str(output_file.name),
+                "input_file": str(input_file.name)
+            }
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "error_code": "PROCESSING_ERROR"
+        }
+```
+
+#### 常见错误与注意事项
+
+**❌ 错误示例：缺少 key**
+```python
+# 这样会找不到文件！
+DATA_INPUTS = Path("data/inputs")  # 缺少 manifest 中定义的 key
+```
+
+**✅ 正确示例：包含完整路径**
+```python
+# 如果 manifest 中是 files.input
+DATA_INPUTS = Path("data/inputs/input")
+
+# 如果 manifest 中是 files.video
+DATA_INPUTS = Path("data/inputs/video")
+
+# 如果 manifest 中是 files.document
+DATA_INPUTS = Path("data/inputs/document")
+```
+
+**路径匹配规则：**
+- Manifest 中的 `files.{key}` → 代码中的 `data/inputs/{key}/`
+- `files.input` → `data/inputs/input/`
+- `files.video` → `data/inputs/video/`
+- `files.images` → `data/inputs/images/`
+
+**多文件输入：**
+如果需要接收多个文件，在 manifest 中定义多个 key：
+
+```json
+{
+  "files": {
+    "video": {
+      "type": "InputFile",
+      "description": "视频文件"
+    },
+    "subtitle": {
+      "type": "InputFile",
+      "description": "字幕文件",
+      "required": false
+    }
+  }
+}
+```
+
+代码中分别访问：
+```python
+video_path = Path("data/inputs/video")
+subtitle_path = Path("data/inputs/subtitle")
+```
+
+**输出文件命名：**
+- 输出文件统一保存到 `data/outputs/` 目录
+- 文件名可以自定义，建议使用有意义的名称
+- 平台会自动收集该目录下的所有文件
+
+### 密钥管理（Secrets）
 
 如果你的预制件需要使用 API Key、数据库连接字符串等敏感信息，可以在函数定义中声明 `secrets` 字段。平台会引导用户配置这些密钥，并在运行时自动注入到环境变量中。
 
@@ -517,7 +675,7 @@ uv add --dev pytest-mock
 
 ### Q: 如何处理敏感信息（如 API Key）？
 
-**A**: 推荐使用 v3.0 新增的 `secrets` 功能：
+**A**: 推荐使用 `secrets` 功能：
 
 1. **在 manifest.json 中声明密钥**（推荐）- 平台会引导用户配置，并自动注入到环境变量
 2. 通过函数参数传递 - 适用于非敏感的配置项
