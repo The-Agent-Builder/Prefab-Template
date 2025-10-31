@@ -19,9 +19,9 @@
 - **测试**: pytest
 - **代码检查**: flake8, isort
 - **Git Hooks**: pre-commit (自动代码质量检查)
-- **构建**: setuptools (v3.0 更新)
+- **构建**: setuptools
 - **CI/CD**: GitHub Actions
-- **配置**: pyproject.toml (PEP 621) + prefab-manifest.json (v3.0 架构)
+- **配置**: pyproject.toml (PEP 621) + prefab-manifest.json
 
 ## 项目结构
 
@@ -59,11 +59,11 @@ prefab-template/
 - 每个函数的签名、参数、返回值都必须准确描述
 - 使用 **JSON Schema 类型**（`string`, `number`, `integer`, `boolean`, `object`, `array`）
 - 支持平台感知类型：`InputFile`（输入文件）和 `OutputFile`（输出文件）
-- 支持 **secrets 字段**（v3.0 新特性）：用于声明函数所需的密钥
+- 支持 **secrets 字段**：用于声明函数所需的密钥
 - 版本号必须与 `pyproject.toml` 保持一致
 - 运行 `uv run python scripts/validate_manifest.py` 验证一致性
 
-### 3. v3.0 文件路径约定（重要！）
+### 3. 文件路径约定（重要！）
 
 **路径规则**：
 - 输入文件路径 = `data/inputs/{files.key}/`
@@ -172,7 +172,7 @@ def stream_function(param: str) -> Iterator[Dict[str, Any]]:
         }
 ```
 
-### 6. Secrets 管理规范（v3.0 新特性）
+### 6. Secrets 管理规范
 
 如果函数需要使用 API Key、数据库连接等敏感信息：
 
@@ -324,7 +324,7 @@ uv add --dev package-name
 A: `src/main.py` 和 `prefab-manifest.json` 的位置和作用不可更改，但可以在 `src/` 下添加更多模块。
 
 **Q: 如何处理敏感信息？**
-A: **推荐使用 v3.0 的 secrets 功能**。在 `prefab-manifest.json` 中声明 `secrets` 字段，平台会自动引导用户配置并注入到环境变量。参见本文档的 "Secrets 管理规范" 章节和 `fetch_weather` 示例。
+A: **推荐使用 secrets 功能**。在 `prefab-manifest.json` 中声明 `secrets` 字段，平台会自动引导用户配置并注入到环境变量。参见本文档的 "Secrets 管理规范" 章节和 `fetch_weather` 示例。
 
 **Q: CI/CD 失败怎么办？**
 A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。本地运行验证脚本排查。

@@ -6,8 +6,8 @@
 1. manifest.json 中声明的所有函数在 main.py 中都存在
 2. 函数参数的数量和名称匹配
 3. manifest.json 的格式正确
-4. 类型系统符合 v2.2 规范
-5. secrets 字段符合 v3.0 规范
+4. 类型系统规范
+5. secrets 字段规范
 """
 
 import ast
@@ -16,7 +16,7 @@ import re
 import sys
 from pathlib import Path
 
-# v2.2 类型系统定义
+# 类型系统定义
 VALID_TYPES = {
     # 基础类型（JSON Schema）
     'string',
@@ -30,13 +30,13 @@ VALID_TYPES = {
     'OutputFile'
 }
 
-# v3.0 secrets 名称格式（大写字母、数字和下划线）
+# secrets 名称格式（大写字母、数字和下划线）
 SECRET_NAME_PATTERN = re.compile(r'^[A-Z0-9_]+$')
 
 
 def validate_files_definition(func_name, files_def):
     """
-    验证 v3.0 的 files 字段定义
+    验证 files 字段定义
 
     files 格式：
     {
@@ -165,7 +165,7 @@ def validate_manifest_schema(manifest):
 
 
 def validate_type_recursive(obj, path=""):
-    """递归验证对象中所有的 type 字段是否符合 v2.2 类型系统"""
+    """递归验证对象中所有的 type 字段是否符合类型系统规范"""
     errors = []
 
     if isinstance(obj, dict):
@@ -193,7 +193,7 @@ def validate_type_recursive(obj, path=""):
 
 
 def validate_type_system(manifest):
-    """验证 manifest 中的类型系统符合 v2.2 规范"""
+    """验证 manifest 中的类型系统规范"""
     errors = []
 
     for func in manifest.get('functions', []):
@@ -214,7 +214,7 @@ def validate_type_system(manifest):
 
 
 def validate_secrets(manifest):
-    """验证 manifest 中的 secrets 字段符合 v3.0 规范"""
+    """验证 manifest 中的 secrets 字段规范"""
     errors = []
     warnings = []
 
@@ -269,7 +269,7 @@ def validate_secrets(manifest):
 
 
 def validate_functions(manifest, actual_functions):
-    """验证函数定义的一致性（支持 v3.0）"""
+    """验证函数定义的一致性"""
     errors = []
     warnings = []
 
@@ -281,12 +281,12 @@ def validate_functions(manifest, actual_functions):
             errors.append(f"函数 '{func_name}' 在 manifest 中声明但在 main.py 中不存在")
             continue
 
-        # v3.0: 验证 files 字段（如果存在）
+        # 验证 files 字段（如果存在）
         if 'files' in func_def:
             file_errors = validate_files_definition(func_name, func_def['files'])
             errors.extend(file_errors)
 
-        # 验证参数（v3.0: files 中的参数不应该在函数签名中）
+        # 验证参数（files 中的参数不应该在函数签名中）
         manifest_params = {p['name']: p for p in func_def.get('parameters', [])}
         actual_params = {p['name']: p for p in actual_functions[func_name]}
 
@@ -350,19 +350,19 @@ def main():
 
     print("✅ Manifest 基本模式验证通过")
 
-    # 验证类型系统（v2.2）
+    # 验证类型系统
     type_errors = validate_type_system(manifest)
     if type_errors:
         print("\n❌ 类型系统验证失败:")
         for error in type_errors:
             print(f"  - {error}")
-        print("\n请使用 v2.2 类型系统规范中定义的类型。")
+        print("\n请使用类型系统规范中定义的类型。")
         print(f"支持的类型: {', '.join(sorted(VALID_TYPES))}")
         sys.exit(1)
 
-    print("✅ 类型系统验证通过（v2.2 规范）")
+    print("✅ 类型系统验证通过")
 
-    # 验证 secrets 字段（v3.0）
+    # 验证 secrets 字段
     secret_errors, secret_warnings = validate_secrets(manifest)
     if secret_errors:
         print("\n❌ Secrets 验证失败:")
@@ -370,7 +370,7 @@ def main():
             print(f"  - {error}")
         sys.exit(1)
 
-    print("✅ Secrets 字段验证通过（v3.0 规范）")
+    print("✅ Secrets 字段验证通过")
 
     # 提取实际函数签名
     main_py_path = Path("src/main.py")

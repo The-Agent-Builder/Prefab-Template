@@ -3,7 +3,7 @@
   "id": "hello-world-prefab",
   "version": "0.1.1",
   "name": "Hello World 示例预制件",
-  "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数（v3.0 架构）",
+  "description": "一个简单的示例预制件，展示如何创建可被 AI 调用的函数",
   "author": "Your Name",
   "github_url": "https://github.com/your-org/your-prefab",
   "tags": [
@@ -171,7 +171,7 @@
     },
     {
       "name": "process_text_file",
-      "description": "处理文本文件（演示文件输入输出，v3.0 架构）",
+      "description": "处理文本文件（演示文件输入输出）",
       "files": {
         "input": {
           "type": "array",

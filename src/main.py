@@ -4,7 +4,7 @@
 这是一个示例预制件，展示了如何创建可被 AI 调用的函数。
 所有暴露给 AI 的函数都必须在此文件中定义。
 
-📁 v3.0 文件路径约定（重要！）：
+📁 文件路径约定（重要！）：
 - 输入文件路径：data/inputs/{files.key}/
   例如：manifest 中 files.input → data/inputs/input/
   例如：manifest 中 files.video → data/inputs/video/
@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator
 
 # 固定路径常量
-# v3.0: 文件组按 manifest 中的 key 组织（这里是 "input"）
+# 文件组按 manifest 中的 key 组织（这里是 "input"）
 # 如果你的 manifest 中使用不同的 key，请相应修改路径
 # 例如：files.video → Path("data/inputs/video")
 DATA_INPUTS = Path("data/inputs/input")
@@ -148,16 +148,16 @@ def add_numbers(a: float, b: float) -> dict:
 
 def process_text_file(operation: str = "uppercase") -> dict:
     """
-    处理文本文件（文件处理示例，v3.0 架构）
+    处理文本文件（文件处理示例）
 
-    这个函数演示了 v3.0 的文件处理方式：
+    这个函数演示了文件处理方式：
     - 文件不再作为参数传入
     - Gateway 自动下载到 data/inputs/
     - Prefab 自动扫描 data/inputs/
     - 输出写入 data/outputs/
     - Gateway 自动上传并在响应中返回文件 URL
 
-    📁 v3.0 文件约定：
+    📁 文件约定：
     - 输入：自动扫描 data/inputs/（Gateway 已下载）
     - 输出：写入 data/outputs/（Gateway 会自动上传）
     - 返回值：不包含文件路径（由 Gateway 管理）
@@ -169,7 +169,7 @@ def process_text_file(operation: str = "uppercase") -> dict:
         包含处理结果的字典（不包含文件路径）
     """
     try:
-        # v3.0: 自动扫描 data/inputs 目录
+        # 自动扫描 data/inputs 目录
         input_files = list(DATA_INPUTS.glob("*"))
         if not input_files:
             return {
@@ -201,12 +201,12 @@ def process_text_file(operation: str = "uppercase") -> dict:
         # 确保输出目录存在
         DATA_OUTPUTS.mkdir(parents=True, exist_ok=True)
 
-        # v3.0: 写入输出文件（Gateway 会自动上传）
+        # 写入输出文件（Gateway 会自动上传）
         output_filename = f"processed_{input_path.name}"
         output_path = DATA_OUTPUTS / output_filename
         output_path.write_text(result, encoding="utf-8")
 
-        # v3.0: 返回结果（不包含文件路径）
+        # 返回结果（不包含文件路径）
         return {
             "success": True,
             "operation": operation,

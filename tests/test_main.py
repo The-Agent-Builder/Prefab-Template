@@ -72,7 +72,7 @@ class TestFileHandling:
         temp_dir = tempfile.mkdtemp()
         workspace_path = Path(temp_dir)
 
-        # 创建目录结构（v3.0: 文件按 manifest key 组织）
+        # 创建目录结构（文件按 manifest key 组织）
         inputs_dir = workspace_path / "data" / "inputs" / "input"
         inputs_dir.mkdir(parents=True)
 
@@ -91,8 +91,8 @@ class TestFileHandling:
         shutil.rmtree(temp_dir)
 
     def test_process_text_file_uppercase(self, workspace):
-        """测试文本转大写（v3.0 架构）"""
-        # v3.0: 不传入文件参数
+        """测试文本转大写"""
+        # 不传入文件参数
         result = process_text_file(operation="uppercase")
 
         assert result["success"] is True
@@ -100,7 +100,7 @@ class TestFileHandling:
         assert result["original_length"] == 11
         assert result["processed_length"] == 11
 
-        # v3.0: 返回值不包含文件路径
+        # 返回值不包含文件路径
         assert "input_file" not in result
         assert "output_file" not in result
 
@@ -110,7 +110,7 @@ class TestFileHandling:
         assert output_files[0].read_text(encoding="utf-8") == "HELLO WORLD"
 
     def test_process_text_file_lowercase(self, workspace):
-        """测试文本转小写（v3.0 架构）"""
+        """测试文本转小写"""
         result = process_text_file(operation="lowercase")
 
         assert result["success"] is True
@@ -121,7 +121,7 @@ class TestFileHandling:
         assert output_files[0].read_text(encoding="utf-8") == "hello world"
 
     def test_process_text_file_reverse(self, workspace):
-        """测试文本反转（v3.0 架构）"""
+        """测试文本反转"""
         result = process_text_file(operation="reverse")
 
         assert result["success"] is True
@@ -132,7 +132,7 @@ class TestFileHandling:
         assert output_files[0].read_text(encoding="utf-8") == "dlroW olleH"
 
     def test_process_text_file_no_input(self, workspace):
-        """测试没有输入文件（v3.0 架构）"""
+        """测试没有输入文件"""
         # 删除所有输入文件
         for f in (workspace / "data" / "inputs" / "input").glob("*"):
             f.unlink()
@@ -143,7 +143,7 @@ class TestFileHandling:
         assert result["error_code"] == "NO_INPUT_FILE"
 
     def test_process_text_file_invalid_operation(self, workspace):
-        """测试无效操作（v3.0 架构）"""
+        """测试无效操作"""
         result = process_text_file(operation="invalid")
 
         assert result["success"] is False
