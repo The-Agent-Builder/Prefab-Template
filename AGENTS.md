@@ -71,7 +71,7 @@ prefab-template/
 
 **实例**：
 ```python
-# 如果 manifest.json 中定义：
+# 如果 prefab-manifest.json 中定义：
 {
   "files": {
     "input": { "type": "InputFile", ... }  // key 是 "input"
@@ -91,7 +91,7 @@ input_files = list(DATA_INPUTS.glob("*"))
 # ❌ 错误：缺少 key
 DATA_INPUTS = Path("data/inputs")  # 这会导致找不到文件！
 
-# ✅ 正确：包含 manifest 中的 key
+# ✅ 正确：包含 prefab-manifest.json 中的 key
 DATA_INPUTS = Path("data/inputs/input")  # 如果 files.input
 DATA_INPUTS = Path("data/inputs/video")  # 如果 files.video
 ```
@@ -176,7 +176,7 @@ def stream_function(param: str) -> Iterator[Dict[str, Any]]:
 
 如果函数需要使用 API Key、数据库连接等敏感信息：
 
-**在 manifest.json 中声明：**
+**在 prefab-manifest.json 中声明：**
 ```json
 {
   "functions": [{
@@ -244,7 +244,7 @@ uv run python scripts/quick_start.py
 - ✅ isort 导入排序
 - ✅ Manifest 验证（与 main.py 一致性）
 - ✅ 单元测试（确保所有测试通过）
-- ✅ 版本同步（manifest 与 pyproject.toml 版本一致）
+- ✅ 版本同步（prefab-manifest.json 与 pyproject.toml 版本一致）
 
 ```bash
 # 安装 hooks
@@ -336,7 +336,7 @@ A: 查看 GitHub Actions 日志，通常是测试失败或 manifest 不一致。
 - [ ] 代码风格正确 (`uv run flake8 src/`)
 - [ ] Manifest 验证通过 (`uv run python scripts/validate_manifest.py`)
 - [ ] 文档已更新（README.md）
-- [ ] 版本号一致（manifest.json 和 git tag）
+- [ ] 版本号一致（prefab-manifest.json 和 git tag）
 
 ## 自动化特性
 
